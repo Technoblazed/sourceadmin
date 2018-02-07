@@ -1,0 +1,11 @@
+module.exports = {
+  db: {
+    host: '',
+    username: '',
+    password: '',
+    database: ''
+  },
+  socket: {
+    port: 19857
+  }
+};

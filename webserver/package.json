@@ -19,9 +19,11 @@
   "homepage": "https://github.com/technoblazed/sourceadmin#readme",
   "dependencies": {
     "carrier": "^0.3.0",
+    "fs": "0.0.1-security",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
     "mysql2": "^1.5.2",
+    "path": "^0.12.7",
     "requestretry": "^1.13.0",
     "sequelize": "^4.33.0"
   }
