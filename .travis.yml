@@ -20,7 +20,7 @@ before_script:
   - 'cd addons/sourcemod/scripting/'
   - 'chmod +x spcomp'
   - 'PATH+=":$PWD"'
-  - 'cp ../../../../gameserver/scripting/include/* include/'
+  - 'cp -R ../../../../gameserver/scripting/include/* include/'
   - 'cd ../../../..'
 script:
   - 'smbuilder --flags="-E"'
