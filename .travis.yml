@@ -1,0 +1,53 @@
+sudo: false
+branches:
+  only:
+    - master
+addons:
+  apt_packages:
+    - lib32stdc++6
+    - zip
+env:
+  - SMVERSION=1.9
+before_script:
+  - 'SHORT_COMMIT=$(git log --format=%h -1)'
+  - 'git clone https://github.com/splewis/sm-builder'
+  - 'cd sm-builder'
+  - 'pip install --user -r requirements.txt'
+  - 'python setup.py install --prefix=~/.local'
+  - 'cd .. && mkdir sm && cd sm/'
+  - 'SMPACKAGE="http://sourcemod.net/latest.php?os=linux&version=${SMVERSION}"'
+  - 'wget $SMPACKAGE && tar xfz $(basename $SMPACKAGE)'
+  - 'cd addons/sourcemod/scripting/'
+  - 'chmod +x spcomp'
+  - 'PATH+=":$PWD"'
+  - 'cp ../../../../gameserver/scripting/include/* include/'
+  - 'cd ../../../..'
+script:
+  - 'smbuilder --flags="-E"'
+notifications:
+  email: true
+before_deploy:
+  - 'mkdir -p builds/sourceadmin/addons/sourcemod/scripting/include'
+  - 'cp -R gameserver/scripting/include/* builds/sourceadmin/addons/sourcemod/scripting/include'
+  - 'cd builds'
+  - 'find sourceadmin/ -printf "%P\n" | tar -cvzf ../sourceadmin-game-$SHORT_COMMIT.tar.gz --no-recursion -C sourceadmin/ -T -'
+  - 'zip -r ../sourceadmin-game-$SHORT_COMMIT.zip sourceadmin/*'
+  - 'cd ..'
+  - 'cp README.md LICENSE webserver/'
+  - 'find webserver/ -printf "%P\n" | tar -cvzf sourceadmin-web-$SHORT_COMMIT.tar.gz --no-recursion -C webserver/ -T -'
+  - 'zip -r sourceadmin-web-$SHORT_COMMIT.zip webserver/*'
+  - 'git config --local user.name "$USER_NAME"'
+  - 'git config --local user.email "$USER_EMAIL"'
+  - 'git tag "rev$TRAVIS_BUILD_NUMBER"'
+deploy:
+  provider: releases
+  api_key:
+    secure: LtB64+PuOolcMib7Y47z1waR/4uc6k0OG3ZVa7kFpTiLX8bvXn8+Dsu1Q6j8FnwFupqXRivB7IBhTx/u6b3olxjiiyYmuLbifs0R+1pMzxnEXKHg1PAnHAXhipSO8eycV/Z9cLA5Ndlo8FklPcGtyAMMojgSQ/S/e5UTd+tOQdYKZzjFndxILAj97Ujh95WZRcxUdRAfbZIyBqMP5VYGIMiP2zZh8Az8tBDaLjwQUqpzL/0cmIdfzAo3/gdLMRohmsHqmHJt7TN8udN4zHE/isTxNXNx/kI0p3mQfwOlfCHcx9k4qpWUR+6duxjRSMCImSETpYRVku97lLLIjrBy9/XYnEF9hpIhUDqKdudV/ctKiF5keuIDDETqTs7h6HAt4KgFvBMWhVlXzdryIN+2UkYv+wWfmp4H6qjmlo6ry5wlR6PkXS7sRe/M85+jmMGso4+KriJfEcPDEUcoMBp3j+s5seyxu1NzxNBMId8+skrMU4OnxEpgBle6GOor22glxAT2R6/H/xjXj8Hece6UJxFbdXF2fXGoUI6o3EapRwvPK2qCTZT4/DJjvimx2WDPqo9SHZCUnQcq5Pjslj5Rurzf3s5ssQspnNAUG5jOyMw1IgFAfotlaA45KbASzAZs9XmgqxN52O/gK5C0ekG6Kjl9dOM+p6dWa59fAhZGGUs=
+  file:
+    - sourceadmin-game-$SHORT_COMMIT.tar.gz
+    - sourceadmin-game-$SHORT_COMMIT.zip
+    - sourceadmin-web-$SHORT_COMMIT.tar.gz
+    - sourceadmin-web-$SHORT_COMMIT.zip
+  skip_cleanup: true
+  on:
+    repo: Technoblazed/sourceadmin

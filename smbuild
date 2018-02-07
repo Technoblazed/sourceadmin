@@ -1,0 +1,14 @@
+GlobPlugins('gameserver/scripting/*.sp')
+
+Package(
+    name = 'sourceadmin',
+    plugins = [
+        'sourceadmin'
+    ],
+    filegroups = {
+        '.': [
+            'README.md',
+            'LICENSE'
+        ]
+    }
+)

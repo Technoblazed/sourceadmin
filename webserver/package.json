@@ -1,0 +1,20 @@
+{
+  "name": "sourceadmin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "private": true,
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/technoblazed/sourceadmin.git"
+  },
+  "author": "https://github.com/technoblazed",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/technoblazed/sourceadmin/issues"
+  },
+  "homepage": "https://github.com/technoblazed/sourceadmin#readme"
+}
