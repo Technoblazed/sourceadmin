@@ -29,6 +29,7 @@ notifications:
 before_deploy:
   - 'mkdir -p builds/sourceadmin/addons/sourcemod/scripting/include'
   - 'cp -R gameserver/scripting/include/* builds/sourceadmin/addons/sourcemod/scripting/include'
+  - 'cp -R gameserver/configs/ gameserver/translations/ builds/sourceadmin/addons/sourcemod'
   - 'cd builds'
   - 'find sourceadmin/ -printf "%P\n" | tar -cvzf ../sourceadmin-game-$SHORT_COMMIT.tar.gz --no-recursion -C sourceadmin/ -T -'
   - 'zip -r ../sourceadmin-game-$SHORT_COMMIT.zip sourceadmin/*'

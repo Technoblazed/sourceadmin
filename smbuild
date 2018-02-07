@@ -2,11 +2,9 @@ GlobPlugins('gameserver/scripting/*.sp')
 
 Package(
     name = 'sourceadmin',
-    configs = 'gameservers/configs/',
     plugins = [
         'sourceadmin'
     ],
-    translations = 'gameservers/translations/',
     filegroups = {
         '.': [
             'README.md',
