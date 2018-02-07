@@ -5,6 +5,7 @@ Package(
     plugins = [
         'sourceadmin'
     ],
+    translations = 'gameservers/translations/',
     filegroups = {
         '.': [
             'README.md',
