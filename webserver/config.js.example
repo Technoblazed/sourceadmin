@@ -6,6 +6,7 @@ module.exports = {
     database: ''
   },
   socket: {
+    password: 'magicalbacon',
     port: 19857
   }
 };

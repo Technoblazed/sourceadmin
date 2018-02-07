@@ -13,6 +13,7 @@ char g_sServerIP[16];
 
 //ConVar g_cHostName;
 ConVar g_cSocketAddress;
+ConVar g_cSocketPassword;
 ConVar g_cSocketPort;
 
 enum SocketStatus
@@ -43,6 +44,7 @@ public void OnPluginStart()
 	//g_cHostName = FindConVar("hostname");
 
 	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server");
+	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
 	g_cSocketPort = CreateConVar("sm_sourceadmin_port", "19857", "Port of the SourceAdmin server", _, true, 1.0);
 
 	AutoExecConfig(true, "sourceadmin");
@@ -108,7 +110,7 @@ public int OnSocketDisconnect(Handle socket, any arg)
 
 	if (g_aCommandQueue.Length > 0)
 	{
-		CreateTimer(3.0, Timer_ProcessData);
+		CreateTimer(5.0, Timer_ProcessData);
 	}
 }
 
@@ -134,7 +136,39 @@ public int OnSocketError(Handle socket, const int errorType, const int errorNum,
 
 public int OnSocketReceive(Handle socket, const char[] receiveData, const int dataSize, any arg)
 {
-	// Socket Receives data
+	char sLocalPassword[64];
+	char sPassword[64];
+	char sType[32];
+
+	g_cSocketPassword.GetString(sLocalPassword, sizeof(sLocalPassword));
+
+	JSONObject jReceiveObject = JSONObject.FromString(receiveData);
+
+	bool bPasswordFound = jReceiveObject.GetString("password", sPassword, sizeof(sPassword));
+	bool bTypeFound = jReceiveObject.GetString("type", sType, sizeof(sType));
+
+	if (!bPasswordFound || !StrEqual(sLocalPassword, sPassword))
+	{
+		return;
+	}
+
+	if (bTypeFound)
+	{
+		if (StrEqual(sType, "auth"))
+		{
+			SendAuthRequest();
+		}
+		else if (StrEqual(sType, "error"))
+		{
+			char sError[256];
+
+			jReceiveObject.GetString("data", sError, sizeof(sError));
+
+			SetFailState("%s", sError);
+		}
+	}
+
+	delete jReceiveObject;
 }
 
 /**
@@ -166,6 +200,39 @@ public void ProcessSocketOutbound()
 			g_aCommandQueue.Erase(0);
 		}
 	}
+}
+
+public void PushRequest(char[] sBuffer, int size)
+{
+	ReplaceString(sBuffer, size, "\n", "", true);
+	ReplaceString(sBuffer, size, "\r", "", true);
+	ReplaceString(sBuffer, size, "\x09", "", true);
+
+	StrCat(sBuffer, size, "\n");
+
+	g_aCommandQueue.PushString(sBuffer);
+
+	ProcessSocketOutbound();
+}
+
+public void SendAuthRequest()
+{
+	char sPassword[64];
+
+	g_cSocketPassword.GetString(sPassword, sizeof(sPassword));
+
+	JSONObject jAuthObject = new JSONObject();
+
+	jAuthObject.SetString("type", "auth");
+	jAuthObject.SetString("password", sPassword);
+
+	char sRequest[512];
+
+	jAuthObject.ToString(sRequest, sizeof(sRequest));
+
+	delete jAuthObject;
+
+	PushRequest(sRequest, sizeof(sRequest));
 }
 
 /**
@@ -241,11 +308,10 @@ public void OnChatMessage(int client, char[] sMessage, int type)
 	char sRequest[512];
 
 	jChatObject.ToString(sRequest, sizeof(sRequest));
-	StrCat(sRequest, sizeof(sRequest), "\n");
-
-	g_aCommandQueue.PushString(sRequest);
 
 	delete jChatObject;
+
+	PushRequest(sRequest, sizeof(sRequest));
 }
 
 /**

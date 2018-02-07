@@ -9,9 +9,12 @@ db.sequelize.sync();
 const serverList = [];
 
 net.createServer((connection) => {
-  connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
-
-  serverList.push(connection);
+  /**
+   * Send Initial Auth Request
+   */
+  writeData(connection, {
+    type: 'auth'
+  });
 
   connection.on('close', () => {
     serverList.splice(serverList.indexOf(connection), 1);
@@ -21,6 +24,30 @@ net.createServer((connection) => {
   });
 
   carrier.carry(connection, async(line) => {
+    try {
+      const data = await JSON.parse(line);
 
+      switch (data.type) {
+        case 'auth': {
+          if (data.token === config.socket.password) {
+            connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
+            serverList.push(connection);
+          } else {
+            writeData(connection, {
+              type: 'error',
+              data: 'Invalid socket password specified!'
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
   });
 }).listen(config.socket.port || 19857);
+
+function writeData(connection, data) {
+  data.password = config.socket.password;
+
+  connection.write(`${JSON.stringify(data)}\n`);
+}
