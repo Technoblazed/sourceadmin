@@ -2,6 +2,7 @@ GlobPlugins('gameserver/scripting/*.sp')
 
 Package(
     name = 'sourceadmin',
+    configs = 'gameservers/configs/',
     plugins = [
         'sourceadmin'
     ],
