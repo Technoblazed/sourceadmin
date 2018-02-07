@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/technoblazed/sourceadmin/issues"
   },
-  "homepage": "https://github.com/technoblazed/sourceadmin#readme"
+  "homepage": "https://github.com/technoblazed/sourceadmin#readme",
+  "dependencies": {
+    "carrier": "^0.3.0",
+    "lodash": "^4.17.5",
+    "moment": "^2.20.1",
+    "mysql2": "^1.5.2",
+    "requestretry": "^1.13.0",
+    "sequelize": "^4.33.0"
+  }
 }
