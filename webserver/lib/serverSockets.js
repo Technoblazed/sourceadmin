@@ -1,5 +1,5 @@
 const carrier = require('carrier');
-const config = require('./config');
+const config = require('../config');
 const net = require('net');
 
 const serverList = [];
@@ -22,7 +22,7 @@ net.createServer((connection) => {
 
       switch (data.type) {
         case 'auth': {
-          if (data.token === config.socket.password) {
+          if (data.password === config.socket.password) {
             connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
             serverList.push(connection);
           } else {

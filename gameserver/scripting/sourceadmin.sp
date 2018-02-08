@@ -1,9 +1,12 @@
 #include <sourcemod>
+#include <logdebug>
 #include <ripext>
 #include <sockets>
 
 #pragma newdecls required
 #pragma semicolon 1
+
+#define PLUGIN_PREFIX "\x01[\x04SourceAdmin\x01]"
 
 ArrayList g_aCommandQueue;
 ArrayList g_aReasons;
@@ -13,8 +16,11 @@ char g_sServerIP[16];
 
 //ConVar g_cHostName;
 ConVar g_cSocketAddress;
+ConVar g_cSocketMaxRetries;
 ConVar g_cSocketPassword;
 ConVar g_cSocketPort;
+
+int g_iRetries;
 
 enum SocketStatus
 {
@@ -39,11 +45,14 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
+	InitDebugLog("sm_sourceadmin_debug", "SA", ADMFLAG_GENERIC);
+
 	LoadTranslations("sourceadmin.phrases.txt");
 
 	//g_cHostName = FindConVar("hostname");
 
 	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server");
+	g_cSocketMaxRetries = CreateConVar("sm_sourceadmin_max_retries", "30", "Maximum amount of times the server will attempt to reconnect to the socket server", _, true, 0.0);
 	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
 	g_cSocketPort = CreateConVar("sm_sourceadmin_port", "19857", "Port of the SourceAdmin server", _, true, 1.0);
 
@@ -55,7 +64,6 @@ public void OnPluginStart()
 	AddCommandListener(CommandListener_Say, "say");
 	AddCommandListener(CommandListener_SayTeam, "say_team");
 
-	g_hSocketHandle = SocketCreate(SOCKET_TCP, OnSocketError);
 	g_sSocketStatus = eSocket_Disconnected;
 
 	g_aCommandQueue = new ArrayList(ByteCountToCells(4096));
@@ -91,6 +99,8 @@ public void ConnectToSocket()
 
 	g_sSocketStatus = eSocket_Connecting;
 
+	g_hSocketHandle = SocketCreate(SOCKET_TCP, OnSocketError);
+
 	SocketSetOption(g_hSocketHandle, SocketReceiveTimeout, 5000);
 	SocketSetOption(g_hSocketHandle, SocketSendTimeout, 5000);
 
@@ -99,6 +109,7 @@ public void ConnectToSocket()
 
 public int OnSocketConnected(Handle socket, any arg)
 {
+	g_iRetries = 0;
 	g_sSocketStatus = eSocket_Connected;
 
 	ProcessSocketOutbound();
@@ -106,16 +117,22 @@ public int OnSocketConnected(Handle socket, any arg)
 
 public int OnSocketDisconnect(Handle socket, any arg)
 {
+	delete g_hSocketHandle;
+
 	g_sSocketStatus = eSocket_Disconnected;
 
-	if (g_aCommandQueue.Length > 0)
-	{
-		CreateTimer(5.0, Timer_ProcessData);
-	}
+	CreateTimer(5.0, Timer_ProcessData);
 }
 
 public Action Timer_ProcessData(Handle timer)
 {
+	g_iRetries++;
+
+	if (g_iRetries > g_cMaxRetries.IntValue)
+	{
+		SetFailState("%s Maximum connection retries reached. (%i/%i)", PLUGIN_PREFIX, g_iRetries, g_cMaxRetries.IntValue);
+	}
+
 	ProcessSocketOutbound();
 }
 
@@ -125,9 +142,7 @@ public int OnSocketError(Handle socket, const int errorType, const int errorNum,
 
 	g_sSocketStatus = eSocket_Closed;
 
-	g_aCommandQueue.Clear();
-
-	LogError("Socket error %d, %d", errorType, errorNum);
+	CreateTimer(5.0, Timer_ProcessData);
 }
 
 /**
@@ -187,7 +202,8 @@ public void ProcessSocketOutbound()
 	{
 		ConnectToSocket();
 	}
-	else if (g_sSocketStatus == eSocket_Connected)
+
+	if (g_sSocketStatus == eSocket_Connected)
 	{
 		char sBuffer[4096];
 
