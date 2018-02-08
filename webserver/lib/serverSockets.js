@@ -21,8 +21,8 @@ net.createServer((connection) => {
     try {
       const data = await JSON.parse(line);
 
-      switch (data.type) {
-        case 'auth': {
+      if (!serverList.includes(connection)) {
+        if (data.type === 'auth') {
           if (data.password === config.socket.password) {
             connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
 
@@ -33,7 +33,12 @@ net.createServer((connection) => {
               data: 'Invalid socket password specified!'
             });
           }
+        } else {
+          return;
         }
+      }
+
+      switch (data.type) {
         case 'chat':
         case 'chat_team': {
           return self.broadcast({
