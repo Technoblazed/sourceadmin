@@ -34,17 +34,14 @@ net.createServer((connection) => {
             });
           }
         }
-        case 'chat': {
-          self.broadcast({
-            type: data.type,
+        case 'chat':
+        case 'chat_team': {
+          return self.broadcast({
+            type: 'chat',
             message: data.message,
             name: data.name,
             steam: data.steam
           });
-          break;
-        }
-        case 'chat_team': {
-          break;
         }
       }
     } catch (e) {
