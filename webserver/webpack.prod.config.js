@@ -7,11 +7,11 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    './src/js/app.js'
+    './client/src/js/app.js'
   ],
   output: {
     filename: 'app.min.js',
-    path: path.resolve(__dirname, 'public', 'assets'),
+    path: path.resolve(__dirname, 'client', 'public', 'assets'),
     publicPath: '/assets/'
   },
   module: {
@@ -41,7 +41,7 @@ module.exports = {
         loader: 'url-loader',
         query: {
           mimetype: 'image/svg+xml',
-          name: './src/css/semantic/themes/default/assets/fonts/icons.svg'
+          name: './client/src/css/semantic/themes/default/assets/fonts/icons.svg'
         }
       },
       {
@@ -49,7 +49,7 @@ module.exports = {
         loader: 'url-loader',
         query: {
           mimetype: 'application/font-woff',
-          name: './src/css/semantic/themes/default/assets/fonts/icons.woff'
+          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff'
         }
       },
       {
@@ -57,7 +57,7 @@ module.exports = {
         loader: 'url-loader',
         query: {
           mimetype: 'application/font-woff2',
-          name: './src/css/semantic/themes/default/assets/fonts/icons.woff2'
+          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff2'
         }
       },
       {
@@ -65,7 +65,7 @@ module.exports = {
         loader: 'url-loader',
         query: {
           mimetype: 'application/octet-stream',
-          name: './src/css/semantic/themes/default/assets/fonts/icons.ttf'
+          name: './client/src/css/semantic/themes/default/assets/fonts/icons.ttf'
         }
       },
       {
@@ -73,13 +73,13 @@ module.exports = {
         loader: 'url-loader',
         query: {
           mimetype: 'application/vnd.ms-fontobject',
-          name: './src/css/semantic/themes/default/assets/fonts/icons.eot'
+          name: './client/src/css/semantic/themes/default/assets/fonts/icons.eot'
         }
       }
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(['public/assets']),
+    new CleanWebpackPlugin(['client/public/assets']),
     new ExtractTextPlugin('app.min.css'),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
