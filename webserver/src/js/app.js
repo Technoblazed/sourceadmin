@@ -1,6 +1,8 @@
 import $ from 'jquery';
-import semantic from '../css/semantic/semantic.js';
-import '../css/semantic/semantic.css';
+
+import '../js/semantic.js';
+
+import '../css/semantic.css';
 import '../css/app.css';
 
 
