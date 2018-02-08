@@ -5,7 +5,12 @@
   "main": "app.js",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "lint": "eslint --ext .js .",
+    "clean": "rm -rf public/*",
+    "build": "webpack --config webpack.prod.config.js",
+    "prod-win": "npm run build && set NODE_ENV=production && node app.js",
+    "prod": "npm run build && NODE_ENV=production nodejs app.js"
   },
   "repository": {
     "type": "git",
@@ -20,11 +25,29 @@
   "dependencies": {
     "carrier": "^0.3.0",
     "fs": "0.0.1-security",
+    "jquery": "^3.3.1",
+    "koa": "^2.4.1",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
     "mysql2": "^1.5.2",
     "path": "^0.12.7",
     "requestretry": "^1.13.0",
     "sequelize": "^4.33.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.1",
+    "clean-webpack-plugin": "^0.1.18",
+    "css-loader": "^0.28.9",
+    "eslint": "^4.17.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^1.1.6",
+    "koa-webpack": "^2.0.3",
+    "koa-webpack-hot-middleware": "^1.0.3",
+    "optimize-css-assets-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.20.1",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-middleware": "^2.0.4",
+    "webpack-hot-middleware": "^2.21.0"
   }
 }
