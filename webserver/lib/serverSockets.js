@@ -18,39 +18,43 @@ net.createServer((connection) => {
   });
 
   carrier.carry(connection, async(line) => {
+    let data;
+
     try {
-      const data = await JSON.parse(line);
-
-      if (!serverList.includes(connection)) {
-        if (data.type === 'auth') {
-          if (data.password === config.socket.password) {
-            connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
-
-            return serverList.push(connection);
-          } else {
-            return self.writeData(connection, {
-              type: 'error',
-              data: 'Invalid socket password specified!'
-            });
-          }
-        } else {
-          return;
-        }
-      }
-
-      switch (data.type) {
-        case 'chat':
-        case 'chat_team': {
-          return self.broadcast({
-            type: 'chat',
-            message: data.message,
-            name: data.name,
-            steam: data.steam
-          });
-        }
-      }
+      data = JSON.parse(line);
     } catch (e) {
       console.log(e);
+
+      return;
+    }
+
+    if (!serverList.includes(connection)) {
+      if (data.type === 'auth') {
+        if (data.password === config.socket.password) {
+          connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
+
+          return serverList.push(connection);
+        } else {
+          return self.writeData(connection, {
+            type: 'error',
+            data: 'Invalid socket password specified!'
+          });
+        }
+      } else {
+        return;
+      }
+    }
+
+    switch (data.type) {
+      case 'chat':
+      case 'chat_team': {
+        return self.broadcast({
+          type: 'chat',
+          message: data.message,
+          name: data.name,
+          steam: data.steam
+        });
+      }
     }
   });
 }).listen(config.socket.port || 19857);
