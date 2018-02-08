@@ -6,8 +6,6 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_PREFIX "\x01[\x04SourceAdmin\x01]"
-
 ArrayList g_aCommandQueue;
 ArrayList g_aReasons;
 
@@ -15,12 +13,45 @@ char g_sReasonsFile[256];
 char g_sServerIP[16];
 
 //ConVar g_cHostName;
+ConVar g_cBroadcastNames;
 ConVar g_cSocketAddress;
 ConVar g_cSocketMaxRetries;
 ConVar g_cSocketPassword;
 ConVar g_cSocketPort;
 
 int g_iRetries;
+
+static char g_sColorNames[][] =
+{
+    "{WHITE}",
+    "{DARK_RED}",
+    "{PINK}",
+    "{GREEN}",
+    "{YELLOW}",
+    "{LIGHT_GREEN}",
+    "{LIGHT_RED}",
+    "{GRAY}",
+    "{ORANGE}",
+    "{LIGHT_BLUE}",
+    "{DARK_BLUE}",
+    "{PURPLE}"
+};
+
+static char g_sColorCodes[][] =
+{
+    "\x01",
+    "\x02",
+    "\x03",
+    "\x04",
+    "\x05",
+    "\x06",
+    "\x07",
+    "\x08",
+    "\x09",
+    "\x0B",
+    "\x0C",
+    "\x0E"
+};
 
 enum SocketStatus
 {
@@ -51,6 +82,7 @@ public void OnPluginStart()
 
 	//g_cHostName = FindConVar("hostname");
 
+	g_cBroadcastNames = CreateConVar("sm_sourceadmin_broadcast_names", "1", "Should admin names be broadcasted when using the online chat system", _, true, 0.0, true, 1.0);
 	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server");
 	g_cSocketMaxRetries = CreateConVar("sm_sourceadmin_max_retries", "30", "Maximum amount of times the server will attempt to reconnect to the socket server", _, true, 0.0);
 	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
@@ -128,9 +160,9 @@ public Action Timer_ProcessData(Handle timer)
 {
 	g_iRetries++;
 
-	if (g_iRetries > g_cMaxRetries.IntValue)
+	if (g_iRetries > g_cSocketMaxRetries.IntValue)
 	{
-		SetFailState("%s Maximum connection retries reached. (%i/%i)", PLUGIN_PREFIX, g_iRetries, g_cMaxRetries.IntValue);
+		SetFailState("[SourceAdmin] Maximum connection retries reached. (%i/%i)", g_iRetries, g_cSocketMaxRetries.IntValue);
 	}
 
 	ProcessSocketOutbound();
@@ -172,6 +204,16 @@ public int OnSocketReceive(Handle socket, const char[] receiveData, const int da
 		if (StrEqual(sType, "auth"))
 		{
 			SendAuthRequest();
+		}
+		else if (StrEqual(sType, "chat"))
+		{
+			char sMessage[256];
+			char sName[64];
+
+			jReceiveObject.GetString("message", sMessage, sizeof(sMessage));
+			jReceiveObject.GetString("name", sName, sizeof(sName));
+
+			BroadcastAdminMessage(sName, sMessage);
 		}
 		else if (StrEqual(sType, "error"))
 		{
@@ -330,6 +372,17 @@ public void OnChatMessage(int client, char[] sMessage, int type)
 	PushRequest(sRequest, sizeof(sRequest));
 }
 
+public void BroadcastAdminMessage(const char[] sName, const char[] sMessage)
+{
+	char sPrefix[256];
+
+	Format(sPrefix, sizeof(sPrefix), "%T", "BroadcastAdminMessage", LANG_SERVER, g_cBroadcastNames.BoolValue ? sName : "Admin");
+
+	Colorize(sPrefix, sizeof(sPrefix));
+
+	PrintToChatAll("%s %s", sPrefix, sMessage);
+}
+
 /**
  *	Server IP Processing
  */
@@ -443,4 +496,12 @@ public void ParseReasonsFile()
 stock bool IsValidClient(int client)
 {
 	return client > 0 && client <= MaxClients && IsClientConnected(client) && IsClientInGame(client);
+}
+
+stock void Colorize(char[] sMessage, int iSize)
+{
+	for (int i; i < sizeof(g_sColorNames); i++)
+	{
+		ReplaceString(sMessage, iSize, g_sColorNames[i], g_sColorCodes[i]);
+	}
 }

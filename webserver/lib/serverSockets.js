@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const carrier = require('carrier');
 const config = require('../config');
 const net = require('net');
@@ -24,13 +25,26 @@ net.createServer((connection) => {
         case 'auth': {
           if (data.password === config.socket.password) {
             connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
-            serverList.push(connection);
+
+            return serverList.push(connection);
           } else {
-            self.writeData(connection, {
+            return self.writeData(connection, {
               type: 'error',
               data: 'Invalid socket password specified!'
             });
           }
+        }
+        case 'chat': {
+          self.broadcast({
+            type: data.type,
+            message: data.message,
+            name: data.name,
+            steam: data.steam
+          });
+          break;
+        }
+        case 'chat_team': {
+          break;
         }
       }
     } catch (e) {
@@ -40,6 +54,11 @@ net.createServer((connection) => {
 }).listen(config.socket.port || 19857);
 
 const self = module.exports = {
+  broadcast: (data) => {
+    _.forEach(serverList, (server) => {
+      self.writeData(server, data);
+    });
+  },
   writeData: (connection, data) => {
     data.password = config.socket.password;
 

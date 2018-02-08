@@ -1,4 +1,12 @@
 "Phrases"
 {
-
+    "BroadcastAdminMessage"
+    {
+        "#format"   "{1:s}"
+        "en"        "[{DARK_BLUE}{1}{WHITE}]"
+    }
+    "Prefix"
+    {
+        "en"        "[{GREEN}SourceAdmin{WHITE}]"
+    }
 }
