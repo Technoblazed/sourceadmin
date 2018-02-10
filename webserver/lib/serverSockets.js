@@ -55,6 +55,18 @@ net.createServer((connection) => {
           steam: data.steam
         });
       }
+      case 'report': {
+        console.log(line);
+        return self.broadcast({
+          type: 'report',
+          cName: data.cName,
+          tName: data.tName,
+          cAuth: data.cAuth,
+          tAuth: data.tAuth,
+          ip: data.ip,
+          reason: data.reason
+        });
+      }
     }
   });
 }).listen(config.socket.port || 19857);

@@ -2,6 +2,7 @@
 #include <logdebug>
 #include <ripext>
 #include <sockets>
+#include <sourceadmin>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -14,6 +15,7 @@ char g_sServerIP[16];
 
 //ConVar g_cHostName;
 ConVar g_cBroadcastNames;
+ConVar g_cHideTriggers;
 ConVar g_cSocketAddress;
 ConVar g_cSocketMaxRetries;
 ConVar g_cSocketPassword;
@@ -85,6 +87,7 @@ public void OnPluginStart()
 	//g_cHostName = FindConVar("hostname");
 
 	g_cBroadcastNames = CreateConVar("sm_sourceadmin_broadcast_names", "1", "Should admin names be broadcasted when using the online chat system", _, true, 0.0, true, 1.0);
+	g_cHideTriggers = CreateConVar("sm_sourceadmin_hide_triggers", "1", "Should chat triggers be hidden from being displayed to chat", _, true, 0.0, true, 1.0);
 	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server");
 	g_cSocketMaxRetries = CreateConVar("sm_sourceadmin_max_retries", "30", "Maximum amount of times the server will attempt to reconnect to the socket server", _, true, 0.0);
 	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
@@ -93,8 +96,8 @@ public void OnPluginStart()
 
 	AutoExecConfig(true, "sourceadmin");
 
-	RegConsoleCmd("call", Command_Report, "Open up the report player menu");
-	RegConsoleCmd("report", Command_Report, "Open up the report player menu");
+	RegConsoleCmd("sm_call", Command_Report, "Open up the report player menu");
+	RegConsoleCmd("sm_report", Command_Report, "Open up the report player menu");
 
 	AddCommandListener(CommandListener_Say, "say");
 	AddCommandListener(CommandListener_SayTeam, "say_team");
@@ -105,7 +108,6 @@ public void OnPluginStart()
 	g_aReasons = new ArrayList(ByteCountToCells(128));
 
 	BuildPath(Path_SM, g_sReasonsFile, sizeof(g_sReasonsFile), "configs/sourceadmin_reasons.cfg");
-
 	if (!FileExists(g_sReasonsFile, false, "GAME"))
 	{
 		GenerateReasonFile();
@@ -121,6 +123,15 @@ public void OnConfigsExecuted()
 	{
 		ConnectToSocket();
 	}
+}
+
+public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int iErrMax)
+{
+	CreateNative("SourceAdmin_PrintToChat", Native_PrintToChat);
+
+	RegPluginLibrary("SourceAdmin");
+
+	return APLRes_Success;
 }
 
 /**
@@ -219,6 +230,14 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			BroadcastAdminMessage(sName, sMessage);
 		}
+		else if (StrEqual(sType, "report"))
+		{
+			char sMessage[512];
+
+			jReceiveObject.ToString(sMessage, sizeof(sMessage));
+
+			BroadcastAdminMessage("memes", sMessage);
+		}
 		else if (StrEqual(sType, "error"))
 		{
 			char sError[256];
@@ -307,12 +326,16 @@ public Action Command_Report(int iClient, int iArgs)
 
 	mReportMenu.SetTitle("%T", "SelectClient", iClient);
 
+	bool bIsAdmin;
+
 	char sName[MAX_NAME_LENGTH];
 	char sSerial[24];
 
-	for (int i; i <= MaxClients; i++)
+	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (IsValidClient(i) && !(CheckCommandAccess(i, "sourceadmin_command", ADMFLAG_GENERIC) && g_cReportImmunity.IntValue != 0))
+		bIsAdmin = CheckCommandAccess(i, "sourceadmin_command", ADMFLAG_GENERIC);
+
+		if (IsValidClient(i) && (!bIsAdmin || (bIsAdmin && g_cReportImmunity.IntValue != 0)))
 		{
 			GetClientName(i, sName, sizeof(sName));
 
@@ -321,6 +344,8 @@ public Action Command_Report(int iClient, int iArgs)
 			mReportMenu.AddItem(sSerial, sName);
 		}
 	}
+
+	mReportMenu.Display(iClient, MENU_TIME_FOREVER);
 
 	return Plugin_Handled;
 }
@@ -366,7 +391,7 @@ public void DrawBanReasons(int iClient)
 
 	int index;
 
-	for (int i; i <= g_aReasons.Length; i++)
+	for (int i; i <= g_aReasons.Length - 1; i++)
 	{
 		g_aReasons.GetString(i, sReason, sizeof(sReason));
 
@@ -377,6 +402,8 @@ public void DrawBanReasons(int iClient)
 
 		mReasonsMenu.AddItem(sReason[index], sReason[index]);
 	}
+
+	mReasonsMenu.Display(iClient, MENU_TIME_FOREVER);
 }
 
 public int ReasonsMenuHandler(Menu mMenu, MenuAction maAction, int iParam1, int iParam2)
@@ -414,16 +441,41 @@ public Action CommandListener_Say(int iClient, const char[] sCommand, int iArgc)
 
 	OnChatMessage(iClient, sMessage, 1);
 
+	if (g_cHideTriggers.BoolValue)
+	{
+		char sMessageLower[192];
+
+		StrToLower(sMessage, sMessageLower, sizeof(sMessageLower));
+
+		if (StrEqual(sMessageLower, "!call") || StrEqual(sMessageLower, "!report"))
+		{
+			return Plugin_Handled;
+		}
+	}
+
 	return Plugin_Continue;
 }
 
 public Action CommandListener_SayTeam(int iClient, const char[] sCommand, int iArgc)
 {
 	char sMessage[192];
+	char sMessageLower[192];
 
 	GetCmdArgString(sMessage, sizeof(sMessage));
 
 	OnChatMessage(iClient, sMessage, 2);
+
+	if (g_cHideTriggers.BoolValue)
+	{
+		char sMessageLower[192];
+
+		StrToLower(sMessage, sMessageLower, sizeof(sMessageLower));
+
+		if (StrEqual(sMessageLower, "!call") || StrEqual(sMessageLower, "!report"))
+		{
+			return Plugin_Handled;
+		}
+	}
 
 	return Plugin_Continue;
 }
@@ -475,8 +527,10 @@ public void BroadcastAdminMessage(const char[] sName, const char[] sMessage)
 	PrintToChatAll("%s %s", sPrefix, sMessage);
 }
 
-public void SourceAdmin_PrintToChat(int iClient, const char[] iFormat, any:...)
+public int Native_PrintToChat(Handle hPlugin, int iNumParams)
 {
+	int iClient = GetNativeCell(1);
+
  	if (!IsValidClient(iClient))
  	{
 	 	return;
@@ -624,7 +678,7 @@ public void GenerateReasonFile()
 
 public void ParseReasonsFile()
 {
-	File fFile = OpenFile(g_sReasonsFile, "w", false, "GAME");
+	File fFile = OpenFile(g_sReasonsFile, "r", false, "GAME");
 
 	if (!fFile)
 	{
@@ -671,4 +725,20 @@ stock void Colorize(char[] sMessage, int iSize)
 	{
 		ReplaceString(sMessage, iSize, g_sColorNames[i], g_sColorCodes[i]);
 	}
+}
+
+stock void StrToLower(const char[] sInput, char[] sOutput, int iSize)
+{
+	iSize--;
+
+	int i;
+
+	while (sInput[i] != '\0' && i < iSize)
+	{
+		sOutput[i] = CharToLower(sInput[i]);
+
+		i++;
+	}
+
+	sOutput[i] = '\0';
 }
