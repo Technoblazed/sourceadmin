@@ -88,10 +88,10 @@ public void OnPluginStart()
 
 	g_cBroadcastNames = CreateConVar("sm_sourceadmin_broadcast_names", "1", "Should admin names be broadcasted when using the online chat system", _, true, 0.0, true, 1.0);
 	g_cHideTriggers = CreateConVar("sm_sourceadmin_hide_triggers", "1", "Should chat triggers be hidden from being displayed to chat", _, true, 0.0, true, 1.0);
-	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server");
+	g_cSocketAddress = CreateConVar("sm_sourceadmin_address", "localhost", "Address of the SourceAdmin server", FCVAR_PROTECTED);
 	g_cSocketMaxRetries = CreateConVar("sm_sourceadmin_max_retries", "30", "Maximum amount of times the server will attempt to reconnect to the socket server", _, true, 0.0);
-	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
-	g_cSocketPort = CreateConVar("sm_sourceadmin_port", "19857", "Port of the SourceAdmin server", _, true, 1.0);
+	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server", FCVAR_PROTECTED);
+	g_cSocketPort = CreateConVar("sm_sourceadmin_port", "19857", "Port of the SourceAdmin server", FCVAR_PROTECTED, true, 1.0);
 	g_cReportImmunity = CreateConVar("sm_sourceadmin_immunity", "2", "Determines admin immunity to the report feature.\n0) Admins cannot be reported and will not be displayed inside the report menu.\n1) Admins can be reported in the same way as other players.\n2) Admins will be displayed in the report menu, but reports will not be sent", _, true, 0.0, true, 2.0);
 
 	AutoExecConfig(true, "sourceadmin");
