@@ -274,14 +274,6 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			PushRequest(sRequest, sizeof(sRequest));
 		}
-		else if (StrEqual(sType, "report"))
-		{
-			char sMessage[512];
-
-			jReceiveObject.ToString(sMessage, sizeof(sMessage));
-
-			BroadcastAdminMessage("memes", sMessage);
-		}
 		else if (StrEqual(sType, "players"))
 		{
 			JSONArray jPlayersArray = new JSONArray();
