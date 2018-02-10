@@ -11,7 +11,8 @@
     }
     "ReportCreated"
     {
-        "en"        "Report submitted."
+        "#format"   "{1:s}"
+        "en"        "Report submitted for {GREEN}{1}{WHITE}."
     }
     "SelectClient"
     {

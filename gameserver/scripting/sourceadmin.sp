@@ -544,7 +544,7 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 
 	PushRequest(sRequest, sizeof(sRequest));
 
-	SourceAdmin_PrintToChat(iClient, "%T", "ReportCreated", iClient);
+	SourceAdmin_PrintToChat(iClient, "%T", "ReportCreated", iClient, sTargetName);
 }
 
 /**
