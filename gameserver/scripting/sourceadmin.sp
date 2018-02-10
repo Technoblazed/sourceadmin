@@ -312,7 +312,7 @@ public Action Command_Report(int iClient, int iArgs)
 
 	for (int i; i <= MaxClients; i++)
 	{
-		if (IsValidClient(i) && g_cReportImmunity.IntValue != 0)
+		if (IsValidClient(i) && !(CheckCommandAccess(i, "sourceadmin_command", ADMFLAG_GENERIC) && g_cReportImmunity.IntValue != 0))
 		{
 			GetClientName(i, sName, sizeof(sName));
 
@@ -542,7 +542,10 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 
 	delete jReportObject;
 
-	PushRequest(sRequest, sizeof(sRequest));
+	if (!CheckCommandAccess(iTarget, "sourceadmin_command", ADMFLAG_GENERIC) || g_cReportImmunity.IntValue == 1)
+	{
+		PushRequest(sRequest, sizeof(sRequest));
+	}
 
 	SourceAdmin_PrintToChat(iClient, "%T", "ReportCreated", iClient, sTargetName);
 }
