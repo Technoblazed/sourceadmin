@@ -339,9 +339,16 @@ public int ReportMenuHandler(Menu menu, MenuAction action, int param1, int param
 		iSerial = StringToInt(sInfo);
 		iTarget = GetClientFromSerial(iSerial);
 
-		g_iReportTarget[param1] = iTarget;
+		if (!IsValidClient(iTarget))
+		{
+			SourceAdmin_PrintToChat(param1, "%T", "ClientDisconnected", param1);
+		}
+		else
+		{
+			g_iReportTarget[param1] = iTarget;
 
-		DrawBanReasons(param1);
+			DrawBanReasons(param1);
+		}
 	}
 	else if (action == MenuAction_End)
 	{
@@ -380,7 +387,14 @@ public int ReasonsMenuHandler(Menu menu, MenuAction action, int param1, int para
 
 		menu.GetItem(param2, sInfo, sizeof(sInfo));
 
-		CreateReport(param1, g_iReportTarget[param1], sInfo);
+		if (!IsValidClient(g_iReportTarget[param1]))
+		{
+			SourceAdmin_PrintToChat(param1, "%T", "ClientDisconnected", param1);
+		}
+		else
+		{
+			CreateReport(param1, g_iReportTarget[param1], sInfo);
+		}
 	}
 	else if (action == MenuAction_End)
 	{
