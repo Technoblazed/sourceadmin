@@ -143,7 +143,7 @@ public void ConnectToSocket()
 	SocketConnect(g_hSocketHandle, OnSocketConnected, OnSocketReceive, OnSocketDisconnect, sHost, g_cSocketPort.IntValue);
 }
 
-public int OnSocketConnected(Handle socket, any arg)
+public int OnSocketConnected(Handle hSocket, any arg)
 {
 	g_iRetries = 0;
 	g_sSocketStatus = eSocket_Connected;
@@ -151,7 +151,7 @@ public int OnSocketConnected(Handle socket, any arg)
 	ProcessSocketOutbound();
 }
 
-public int OnSocketDisconnect(Handle socket, any arg)
+public int OnSocketDisconnect(Handle hSocket, any arg)
 {
 	delete g_hSocketHandle;
 
@@ -160,7 +160,7 @@ public int OnSocketDisconnect(Handle socket, any arg)
 	CreateTimer(5.0, Timer_ProcessData);
 }
 
-public Action Timer_ProcessData(Handle timer)
+public Action Timer_ProcessData(Handle hTimer)
 {
 	g_iRetries++;
 
@@ -172,7 +172,7 @@ public Action Timer_ProcessData(Handle timer)
 	ProcessSocketOutbound();
 }
 
-public int OnSocketError(Handle socket, const int errorType, const int errorNum, any arg)
+public int OnSocketError(Handle hSocket, const int iErrorType, const int iErrorNum, any arg)
 {
 	delete g_hSocketHandle;
 
@@ -185,7 +185,7 @@ public int OnSocketError(Handle socket, const int errorType, const int errorNum,
  *	Socket Processing - Inbound
  */
 
-public int OnSocketReceive(Handle socket, const char[] receiveData, const int dataSize, any arg)
+public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int iDataSize, any arg)
 {
 	char sLocalPassword[64];
 	char sPassword[64];
@@ -193,7 +193,7 @@ public int OnSocketReceive(Handle socket, const char[] receiveData, const int da
 
 	g_cSocketPassword.GetString(sLocalPassword, sizeof(sLocalPassword));
 
-	JSONObject jReceiveObject = JSONObject.FromString(receiveData);
+	JSONObject jReceiveObject = JSONObject.FromString(sReceiveData);
 
 	bool bPasswordFound = jReceiveObject.GetString("password", sPassword, sizeof(sPassword));
 	bool bTypeFound = jReceiveObject.GetString("type", sType, sizeof(sType));
@@ -264,13 +264,13 @@ public void ProcessSocketOutbound()
 	}
 }
 
-public void PushRequest(char[] sBuffer, int size)
+public void PushRequest(char[] sBuffer, int iSize)
 {
-	ReplaceString(sBuffer, size, "\n", "", true);
-	ReplaceString(sBuffer, size, "\r", "", true);
-	ReplaceString(sBuffer, size, "\x09", "", true);
+	ReplaceString(sBuffer, iSize, "\n", "", true);
+	ReplaceString(sBuffer, iSize, "\r", "", true);
+	ReplaceString(sBuffer, iSize, "\x09", "", true);
 
-	StrCat(sBuffer, size, "\n");
+	StrCat(sBuffer, iSize, "\n");
 
 	g_aCommandQueue.PushString(sBuffer);
 
@@ -301,11 +301,11 @@ public void SendAuthRequest()
  *	Command Processing
  */
 
-public Action Command_Report(int client, int args)
+public Action Command_Report(int iClient, int iArgs)
 {
 	Menu mReportMenu = new Menu(ReportMenuHandler);
 
-	mReportMenu.SetTitle("%T", "SelectClient", client);
+	mReportMenu.SetTitle("%T", "SelectClient", iClient);
 
 	char sName[MAX_NAME_LENGTH];
 	char sSerial[24];
@@ -325,42 +325,42 @@ public Action Command_Report(int client, int args)
 	return Plugin_Handled;
 }
 
-public int ReportMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+public int ReportMenuHandler(Menu mMenu, MenuAction maAction, int iParam1, int iParam2)
 {
-	if (action == MenuAction_Select)
+	if (maAction == MenuAction_Select)
 	{
 		char sInfo[24];
 
 		int iSerial;
 		int iTarget;
 
-		menu.GetItem(param2, sInfo, sizeof(sInfo));
+		mMenu.GetItem(iParam2, sInfo, sizeof(sInfo));
 
 		iSerial = StringToInt(sInfo);
 		iTarget = GetClientFromSerial(iSerial);
 
 		if (!IsValidClient(iTarget))
 		{
-			SourceAdmin_PrintToChat(param1, "%T", "ClientDisconnected", param1);
+			SourceAdmin_PrintToChat(iParam1, "%T", "ClientDisconnected", iParam1);
 		}
 		else
 		{
-			g_iReportTarget[param1] = iTarget;
+			g_iReportTarget[iParam1] = iTarget;
 
-			DrawBanReasons(param1);
+			DrawBanReasons(iParam1);
 		}
 	}
-	else if (action == MenuAction_End)
+	else if (maAction == MenuAction_End)
 	{
-		delete menu;
+		delete mMenu;
 	}
 }
 
-public void DrawBanReasons(int client)
+public void DrawBanReasons(int iClient)
 {
 	Menu mReasonsMenu = new Menu(ReasonsMenuHandler);
 
-	mReasonsMenu.SetTitle("%T", "SelectReason", client);
+	mReasonsMenu.SetTitle("%T", "SelectReason", iClient);
 
 	char sReason[128];
 
@@ -379,26 +379,26 @@ public void DrawBanReasons(int client)
 	}
 }
 
-public int ReasonsMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+public int ReasonsMenuHandler(Menu mMenu, MenuAction maAction, int iParam1, int iParam2)
 {
-	if (action == MenuAction_Select)
+	if (maAction == MenuAction_Select)
 	{
 		char sInfo[24];
 
-		menu.GetItem(param2, sInfo, sizeof(sInfo));
+		mMenu.GetItem(iParam2, sInfo, sizeof(sInfo));
 
-		if (!IsValidClient(g_iReportTarget[param1]))
+		if (!IsValidClient(g_iReportTarget[iParam1]))
 		{
-			SourceAdmin_PrintToChat(param1, "%T", "ClientDisconnected", param1);
+			SourceAdmin_PrintToChat(iParam1, "%T", "ClientDisconnected", iParam1);
 		}
 		else
 		{
-			CreateReport(param1, g_iReportTarget[param1], sInfo);
+			CreateReport(iParam1, g_iReportTarget[iParam1], sInfo);
 		}
 	}
-	else if (action == MenuAction_End)
+	else if (maAction == MenuAction_End)
 	{
-		delete menu;
+		delete mMenu;
 	}
 }
 
@@ -406,31 +406,31 @@ public int ReasonsMenuHandler(Menu menu, MenuAction action, int param1, int para
  *	Chat Processing
  */
 
-public Action CommandListener_Say(int client, const char[] command, int argc)
+public Action CommandListener_Say(int iClient, const char[] sCommand, int iArgc)
 {
 	char sMessage[192];
 
 	GetCmdArgString(sMessage, sizeof(sMessage));
 
-	OnChatMessage(client, sMessage, 1);
+	OnChatMessage(iClient, sMessage, 1);
 
 	return Plugin_Continue;
 }
 
-public Action CommandListener_SayTeam(int client, const char[] command, int argc)
+public Action CommandListener_SayTeam(int iClient, const char[] sCommand, int iArgc)
 {
 	char sMessage[192];
 
 	GetCmdArgString(sMessage, sizeof(sMessage));
 
-	OnChatMessage(client, sMessage, 2);
+	OnChatMessage(iClient, sMessage, 2);
 
 	return Plugin_Continue;
 }
 
-public void OnChatMessage(int client, char[] sMessage, int type)
+public void OnChatMessage(int iClient, char[] sMessage, int iType)
 {
-	if (!IsValidClient(client))
+	if (!IsValidClient(iClient))
 	{
 		return;
 	}
@@ -445,20 +445,12 @@ public void OnChatMessage(int client, char[] sMessage, int type)
 	char sName[64];
 	char sSteamID[20];
 
-	GetClientName(client, sName, sizeof(sName));
-	GetClientAuthId(client, AuthId_SteamID64, sSteamID, sizeof(sSteamID));
+	GetClientName(iClient, sName, sizeof(sName));
+	GetClientAuthId(iClient, AuthId_SteamID64, sSteamID, sizeof(sSteamID));
 
 	JSONObject jChatObject = new JSONObject();
 
-	if (type == 1)
-	{
-		jChatObject.SetString("type", "chat");
-	}
-	else if (type == 2)
-	{
-		jChatObject.SetString("type", "chat_team");
-	}
-
+	jChatObject.SetString("type", (iType == 1) ? "chat" : "chat_team");
 	jChatObject.SetString("message", sMessage);
 	jChatObject.SetString("name", sName);
 	jChatObject.SetString("steam", sSteamID);
@@ -483,9 +475,9 @@ public void BroadcastAdminMessage(const char[] sName, const char[] sMessage)
 	PrintToChatAll("%s %s", sPrefix, sMessage);
 }
 
-public void SourceAdmin_PrintToChat(int client, const char[] format, any:...)
+public void SourceAdmin_PrintToChat(int iClient, const char[] iFormat, any:...)
 {
- 	if (!IsValidClient(client))
+ 	if (!IsValidClient(iClient))
  	{
 	 	return;
  	}
@@ -493,24 +485,24 @@ public void SourceAdmin_PrintToChat(int client, const char[] format, any:...)
   	char buffer[1024];
   	int bytesWritten = 0;
 
-  	SetGlobalTransTarget(client);
+  	SetGlobalTransTarget(iClient);
   	FormatNativeString(0, 2, 3, sizeof(buffer), bytesWritten, buffer);
 
   	char sMessage[1024];
 
-	Format(sMessage, sizeof(sMessage), "%T %s", "Prefix", client, buffer);
+	Format(sMessage, sizeof(sMessage), "%T %s", "Prefix", iClient, buffer);
 
-  	if (client == 0)
+  	if (iClient == 0)
 	{
 		Colorize(sMessage, sizeof(sMessage));
 
-		PrintToConsole(client, sMessage);
+		PrintToConsole(iClient, sMessage);
   	}
-	else if (IsClientInGame(client))
+	else if (IsClientInGame(iClient))
 	{
 		Colorize(sMessage, sizeof(sMessage));
 
-		PrintToChat(client, sMessage);
+		PrintToChat(iClient, sMessage);
   	}
 }
 
@@ -571,15 +563,15 @@ public void BuildIP()
 	{
 		FindConVar("ip").GetString(sPublicAddress, sizeof(sPublicAddress));
 
-		int index = FindCharInString(sPublicAddress, ':');
+		int iIndex = FindCharInString(sPublicAddress, ':');
 
-		if (index == -1)
+		if (iIndex == -1)
 		{
 			sPublicAddress[0] = '\0';
 		}
 		else
 		{
-			sPublicAddress[index] = '\0';
+			sPublicAddress[iIndex] = '\0';
 		}
 	}
 
@@ -607,38 +599,38 @@ public void BuildIP()
 
 public void GenerateReasonFile()
 {
-	File file = OpenFile(g_sReasonsFile, "w", false, "GAME");
+	File fFile = OpenFile(g_sReasonsFile, "w", false, "GAME");
 
-	if (!file)
+	if (!fFile)
 	{
 		SetFailState("Failed to open config file 'config/sourceadmin_reasons.cfg' for writing!");
 	}
 
-	file.WriteLine("// List of reasons seperated by a new line, max %d in length", 128);
-	file.WriteLine("Advertising");
-	file.WriteLine("Chat/Mic Spam");
-	file.WriteLine("Disrespect");
-	file.WriteLine("Hacking");
-	file.WriteLine("Harrassment");
-	file.WriteLine("Hate Speech/Racism");
-	file.WriteLine("Impersonation");
-	file.WriteLine("Inappropriate Name");
+	fFile.WriteLine("// List of reasons seperated by a new line, max %d in length", 128);
+	fFile.WriteLine("Advertising");
+	fFile.WriteLine("Chat/Mic Spam");
+	fFile.WriteLine("Disrespect");
+	fFile.WriteLine("Hacking");
+	fFile.WriteLine("Harrassment");
+	fFile.WriteLine("Hate Speech/Racism");
+	fFile.WriteLine("Impersonation");
+	fFile.WriteLine("Inappropriate Name");
 
-	file.Close();
+	fFile.Close();
 }
 
 public void ParseReasonsFile()
 {
-	File file = OpenFile(g_sReasonsFile, "w", false, "GAME");
+	File fFile = OpenFile(g_sReasonsFile, "w", false, "GAME");
 
-	if (!file)
+	if (!fFile)
 	{
 		SetFailState("Failed to open config file 'config/sourceadmin_reasons.cfg' for reading!");
 	}
 
 	char sBuffer[128];
 
-	while (!file.EndOfFile() && file.ReadLine(sBuffer, sizeof(sBuffer)))
+	while (!fFile.EndOfFile() && fFile.ReadLine(sBuffer, sizeof(sBuffer)))
 	{
 		if (!(sBuffer[0] == '/' || IsCharSpace(sBuffer[0])))
 		{
@@ -658,16 +650,16 @@ public void ParseReasonsFile()
 		}
 	}
 
-	file.Close();
+	fFile.Close();
 }
 
 /**
  *	Stock Functions
  */
 
-stock bool IsValidClient(int client)
+stock bool IsValidClient(int iClient)
 {
-	return client > 0 && client <= MaxClients && IsClientConnected(client) && IsClientInGame(client);
+	return iClient > 0 && iClient <= MaxClients && IsClientConnected(iClient) && IsClientInGame(iClient);
 }
 
 stock void Colorize(char[] sMessage, int iSize)
