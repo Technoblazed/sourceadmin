@@ -670,7 +670,6 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 	JSONObject jReportObject = new JSONObject();
 
 	jReportObject.SetString("type", "report");
-	jReportObject.SetString("sAddress", g_sServerIP);
 	jReportObject.SetString("reason", sReason);
 
 	jReportObject.SetString("cAddress", sClientAddress);
