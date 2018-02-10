@@ -238,6 +238,46 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			BroadcastAdminMessage("memes", sMessage);
 		}
+		else if (StrEqual(sType, "players"))
+		{
+			JSONArray jPlayersArray = new JSONArray();
+
+			char sAuth[32];
+			char sName[MAX_NAME_LENGTH];
+
+			int iUser;
+
+			for (int i = 1; i <= MaxClients; i++)
+			{
+				if (IsValidClient(i))
+				{
+					GetClientAuthId(i, AuthId_SteamID64, sAuth, sizeof(sAuth));
+					GetClientName(i, sName, sizeof(sName));
+
+					iUser = GetClientUserId(i);
+
+					JSONObject jPlayerObject = new JSONObject();
+
+					jPlayerObject.SetInt("id", iUser);
+					jPlayerObject.SetString("auth", sAuth);
+					jPlayerObject.SetString("name", sName);
+
+					jPlayersArray.Push(jPlayerObject);
+
+					delete jPlayerObject;
+				}
+			}
+
+			JSONObject jPlayersObject = new JSONObject();
+
+			jPlayersObject.SetString("type", "players");
+
+			jPlayersObject.SetString("ip", g_sServerIP);
+			jPlayersObject.Set("players", jPlayersArray);
+
+			delete jPlayersArray;
+			delete jPlayersObject;
+		}
 		else if (StrEqual(sType, "error"))
 		{
 			char sError[256];

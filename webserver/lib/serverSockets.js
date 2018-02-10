@@ -56,10 +56,17 @@ net.createServer((connection) => {
           steam: data.steam
         });
       }
+      case 'players': {
+        return self.broadcast({
+          type: data.type,
+          sAddress: data.ip,
+          players: data.players
+        });
+      }
       case 'report': {
         return self.broadcast({
           type: data.type,
-          cAddress: data.cAddress,
+          ip: data.cAddress,
           tAddress: data.tAddress,
           cAuth: data.cAuth,
           tAuth: data.tAuth,
