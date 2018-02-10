@@ -13,7 +13,7 @@ ArrayList g_aReasons;
 char g_sReasonsFile[256];
 char g_sServerIP[16];
 
-//ConVar g_cHostName;
+ConVar g_cHostName;
 ConVar g_cBroadcastNames;
 ConVar g_cHideTriggers;
 ConVar g_cSocketAddress;
@@ -84,7 +84,7 @@ public void OnPluginStart()
 
 	LoadTranslations("sourceadmin.phrases.txt");
 
-	//g_cHostName = FindConVar("hostname");
+	g_cHostName = FindConVar("hostname");
 
 	g_cBroadcastNames = CreateConVar("sm_sourceadmin_broadcast_names", "1", "Should admin names be broadcasted when using the online chat system", _, true, 0.0, true, 1.0);
 	g_cHideTriggers = CreateConVar("sm_sourceadmin_hide_triggers", "1", "Should chat triggers be hidden from being displayed to chat", _, true, 0.0, true, 1.0);
@@ -298,14 +298,17 @@ public void PushRequest(char[] sBuffer, int iSize)
 
 public void SendAuthRequest()
 {
+	char sHostname[128];
 	char sPassword[64];
 
+	g_cHostName.GetString(sHostname, sizeof(sHostname));
 	g_cSocketPassword.GetString(sPassword, sizeof(sPassword));
 
 	JSONObject jAuthObject = new JSONObject();
 
 	jAuthObject.SetString("type", "auth");
 	jAuthObject.SetString("password", sPassword);
+	jAuthObject.SetString("hostname", sHostname);
 
 	char sRequest[512];
 

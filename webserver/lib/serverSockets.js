@@ -31,6 +31,7 @@ net.createServer((connection) => {
     if (!serverList.includes(connection)) {
       if (data.type === 'auth') {
         if (data.password === config.socket.password) {
+          connection.hostname = data.hostname;
           connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
 
           return serverList.push(connection);
