@@ -462,7 +462,6 @@ public Action CommandListener_Say(int iClient, const char[] sCommand, int iArgc)
 public Action CommandListener_SayTeam(int iClient, const char[] sCommand, int iArgc)
 {
 	char sMessage[192];
-	char sMessageLower[192];
 
 	GetCmdArgString(sMessage, sizeof(sMessage));
 
