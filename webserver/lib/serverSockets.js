@@ -49,32 +49,43 @@ net.createServer((connection) => {
     switch (data.type) {
       case 'chat':
       case 'chat_team': {
-        return self.broadcast({
+        return;
+        /*
+        {
           type: 'chat',
           message: data.message,
           name: data.name,
           steam: data.steam
-        });
+        }
+        */
       }
       case 'players': {
-        return self.broadcast({
+        return;
+        /*
+        {
           type: data.type,
           ip: data.ip,
           players: data.players
-        });
+        }
+        */
       }
       case 'refresh': {
-        return self.broadcast({
+        return;
+        /*
+        {
           type: data.type,
           hostname: data.hostname,
           ip: data.ip,
           map: data.map,
           maxPlayers: data.maxPlayers,
           players: data.players
-        });
+        }
+        */
       }
       case 'report': {
-        return self.broadcast({
+        return;
+        /*
+        {
           type: data.type,
           ip: data.cAddress,
           tAddress: data.tAddress,
@@ -84,7 +95,7 @@ net.createServer((connection) => {
           tName: data.tName,
           sAddress: data.ip,
           reason: data.reason
-        });
+        }*/
       }
     }
   });
