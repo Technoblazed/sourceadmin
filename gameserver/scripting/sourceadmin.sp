@@ -334,18 +334,31 @@ public Action Command_Report(int iClient, int iArgs)
 	char sName[MAX_NAME_LENGTH];
 	char sSerial[24];
 
+	int iClients;
+
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		bIsAdmin = CheckCommandAccess(i, "sourceadmin_command", ADMFLAG_GENERIC);
 
 		if (IsValidClient(i) && (!bIsAdmin || (bIsAdmin && g_cReportImmunity.IntValue != 0)))
 		{
+			iClients++;
+
 			GetClientName(i, sName, sizeof(sName));
 
 			Format(sSerial, sizeof(sSerial), "%d", GetClientSerial(i));
 
 			mReportMenu.AddItem(sSerial, sName);
 		}
+	}
+
+	if (iClients == 0)
+	{
+		char sFormat[64];
+
+		Format(sFormat, sizeof(sFormat), "%T", "NoClientsFound", iClient);
+
+		mReportMenu.AddItem("-1", sFormat, ITEMDRAW_DISABLED);
 	}
 
 	mReportMenu.Display(iClient, MENU_TIME_FOREVER);
@@ -392,7 +405,8 @@ public void DrawBanReasons(int iClient)
 
 	char sReason[128];
 
-	int index;
+	int iIndex;
+	int iReasons;
 
 	for (int i; i <= g_aReasons.Length - 1; i++)
 	{
@@ -403,7 +417,18 @@ public void DrawBanReasons(int iClient)
 			continue;
 		}
 
-		mReasonsMenu.AddItem(sReason[index], sReason[index]);
+		iReasons++;
+
+		mReasonsMenu.AddItem(sReason[iIndex], sReason[iIndex]);
+	}
+
+	if (iReasons == 0)
+	{
+		char sFormat[64];
+
+		Format(sFormat, sizeof(sFormat), "%T", "NoReasonsFound", iClient);
+
+		mReasonsMenu.AddItem("-1", sFormat, ITEMDRAW_DISABLED);
 	}
 
 	mReasonsMenu.Display(iClient, MENU_TIME_FOREVER);

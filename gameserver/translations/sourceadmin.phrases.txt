@@ -5,6 +5,14 @@
         "#format"   "{1:s}"
         "en"        "[{DARK_BLUE}{1}{WHITE}]"
     }
+    "NoClientsFound"
+    {
+        "en"        "No reportable clients found."
+    }
+    "NoReasonsFound"
+    {
+        "en"        "No reasons found. Please contact an admin!"
+    }
     "Prefix"
     {
         "en"        "[{GREEN}SourceAdmin{WHITE}]"
