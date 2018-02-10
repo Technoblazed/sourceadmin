@@ -1,7 +1,4 @@
 sudo: false
-language: python
-python:
-  - "3.6"
 branches:
   only:
     - master
@@ -15,8 +12,9 @@ before_script:
   - 'SHORT_COMMIT=$(git log --format=%h -1)'
   - 'git clone https://github.com/splewis/sm-builder'
   - 'cd sm-builder'
-  - 'pip install -r requirements.txt'
-  - 'python3 setup.py install --prefix=~/.local'
+  - 'git reset --hard aa27ee36d56f0f521702f07e4502fa27fc2d0b2c'
+  - 'pip install --user -r requirements.txt'
+  - 'python setup.py install --prefix=~/.local'
   - 'cd .. && mkdir sm && cd sm/'
   - 'SMPACKAGE="http://sourcemod.net/latest.php?os=linux&version=${SMVERSION}"'
   - 'wget $SMPACKAGE && tar xfz $(basename $SMPACKAGE)'
