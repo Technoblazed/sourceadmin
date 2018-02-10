@@ -15,7 +15,7 @@ before_script:
   - 'SHORT_COMMIT=$(git log --format=%h -1)'
   - 'git clone https://github.com/splewis/sm-builder'
   - 'cd sm-builder'
-  - 'pip install --user -r requirements.txt'
+  - 'pip install -r requirements.txt'
   - 'python setup.py install --prefix=~/.local'
   - 'cd .. && mkdir sm && cd sm/'
   - 'SMPACKAGE="http://sourcemod.net/latest.php?os=linux&version=${SMVERSION}"'
