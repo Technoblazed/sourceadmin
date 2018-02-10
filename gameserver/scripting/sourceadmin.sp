@@ -593,11 +593,16 @@ public int Native_PrintToChat(Handle hPlugin, int iNumParams)
 
 public void CreateReport(int iClient, int iTarget, const char[] sReason)
 {
+	char sClientAddress[16];
 	char sClientAuth[32];
 	char sClientName[MAX_NAME_LENGTH];
 
+	char sTargetAddress[16];
 	char sTargetAuth[32];
 	char sTargetName[MAX_NAME_LENGTH];
+
+	GetClientIP(iClient, sClientAddress, sizeof(sClientAddress));
+	GetClientIP(iClient, sTargetAddress, sizeof(sTargetAddress));
 
 	GetClientName(iClient, sClientName, sizeof(sClientName));
 	GetClientName(iTarget, sTargetName, sizeof(sTargetName));
@@ -607,15 +612,18 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 
 	JSONObject jReportObject = new JSONObject();
 
-	jReportObject.SetString("cName", sClientName);
-	jReportObject.SetString("tName", sTargetName);
+	jReportObject.SetString("type", "report");
+	jReportObject.SetString("sAddress", g_sServerIP);
+	jReportObject.SetString("reason", sReason);
+
+	jReportObject.SetString("cAddress", sClientAddress);
+	jReportObject.SetString("tAddress", sTargetAddress);
 
 	jReportObject.SetString("cAuth", sClientAuth);
 	jReportObject.SetString("tAuth", sTargetAuth);
 
-	jReportObject.SetString("ip", g_sServerIP);
-	jReportObject.SetString("reason", sReason);
-	jReportObject.SetString("type", "report");
+	jReportObject.SetString("cName", sClientName);
+	jReportObject.SetString("tName", sTargetName);
 
 	char sRequest[512];
 

@@ -58,12 +58,14 @@ net.createServer((connection) => {
       }
       case 'report': {
         return self.broadcast({
-          type: 'report',
-          cName: data.cName,
-          tName: data.tName,
+          type: data.type,
+          cAddress: data.cAddress,
+          tAddress: data.tAddress,
           cAuth: data.cAuth,
           tAuth: data.tAuth,
-          ip: data.ip,
+          cName: data.cName,
+          tName: data.tName,
+          sAddress: data.ip,
           reason: data.reason
         });
       }
