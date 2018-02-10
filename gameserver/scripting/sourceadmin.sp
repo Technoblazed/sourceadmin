@@ -260,7 +260,6 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			jRefreshObject.SetString("type", "refresh");
 
 			jRefreshObject.SetString("hostname", sHostname);
-			jRefreshObject.SetString("ip", g_sServerIP);
 			jRefreshObject.SetString("map", sMapname);
 
 			jRefreshObject.SetInt("maxPlayers", GetMaxHumanPlayers());
@@ -308,7 +307,6 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jPlayersObject.SetString("type", "players");
 
-			jPlayersObject.SetString("ip", g_sServerIP);
 			jPlayersObject.Set("players", jPlayersArray);
 
 			char sRequest[4096];
