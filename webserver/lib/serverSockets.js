@@ -59,7 +59,17 @@ net.createServer((connection) => {
       case 'players': {
         return self.broadcast({
           type: data.type,
-          sAddress: data.ip,
+          ip: data.ip,
+          players: data.players
+        });
+      }
+      case 'refresh': {
+        return self.broadcast({
+          type: data.type,
+          hostname: data.hostname,
+          ip: data.ip,
+          map: data.map,
+          maxPlayers: data.maxPlayers,
           players: data.players
         });
       }
