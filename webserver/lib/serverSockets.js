@@ -3,6 +3,7 @@ const carrier = require('carrier');
 const config = require('../config');
 const net = require('net');
 
+const serverData = {};
 const serverList = [];
 
 net.createServer((connection) => {
@@ -31,8 +32,10 @@ net.createServer((connection) => {
     if (!serverList.includes(connection)) {
       if (data.type === 'auth') {
         if (data.password === config.socket.password) {
-          connection.hostname = data.hostname;
-          connection.name = `${connection.remoteAddress}:${connection.remotePort}`;
+          const host = `${connection.remoteAddress}:${connection.remotePort}`;
+
+          serverData.host = {};
+          connection.name = host;
 
           return serverList.push(connection);
         } else {
@@ -49,7 +52,20 @@ net.createServer((connection) => {
     switch (data.type) {
       case 'chat':
       case 'chat_team': {
-        return;
+        if (!serverData[connection.host].messages) {
+          serverData[connection.host].messages = [];
+        }
+
+        if (serverData[connection.host].messages.length >= 250) {
+          serverData[connection.host].messages.shift();
+        }
+
+        return serverData[connection.host].messages.push({
+          message: data.message,
+          name: data.name,
+          steam: data.steam,
+          timestamp: new Date()
+        });
         /*
         {
           type: 'chat',
@@ -60,22 +76,24 @@ net.createServer((connection) => {
         */
       }
       case 'players': {
-        return;
+        delete data.type;
+
+        return Object.assign(serverData[connection.host], data);
         /*
         {
           type: data.type,
-          ip: data.ip,
           players: data.players
         }
         */
       }
       case 'refresh': {
-        return;
+        delete data.type;
+
+        return Object.assign(serverData[connection.host], data);
         /*
         {
           type: data.type,
           hostname: data.hostname,
-          ip: data.ip,
           map: data.map,
           maxPlayers: data.maxPlayers,
           players: data.players
