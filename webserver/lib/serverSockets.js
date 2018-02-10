@@ -61,6 +61,7 @@ net.createServer((connection) => {
         }
 
         return serverData[connection.host].messages.push({
+          type: data.type,
           message: data.message,
           name: data.name,
           steam: data.steam,
