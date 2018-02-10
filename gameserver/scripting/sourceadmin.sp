@@ -340,7 +340,7 @@ public Action Command_Report(int iClient, int iArgs)
 	{
 		bIsAdmin = CheckCommandAccess(i, "sourceadmin_command", ADMFLAG_GENERIC);
 
-		if (IsValidClient(i) && (!bIsAdmin || (bIsAdmin && g_cReportImmunity.IntValue != 0)))
+		if (i != iClient && IsValidClient(i) && (!bIsAdmin || (bIsAdmin && g_cReportImmunity.IntValue != 0)))
 		{
 			iClients++;
 
