@@ -218,7 +218,23 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 	{
 		if (StrEqual(sType, "auth"))
 		{
-			SendAuthRequest();
+			char sHostname[128];
+
+			g_cHostName.GetString(sHostname, sizeof(sHostname));
+
+			JSONObject jAuthObject = new JSONObject();
+
+			jAuthObject.SetString("type", "auth");
+			jAuthObject.SetString("password", sLocalPassword);
+			jAuthObject.SetString("hostname", sHostname);
+
+			char sRequest[512];
+
+			jAuthObject.ToString(sRequest, sizeof(sRequest));
+
+			delete jAuthObject;
+
+			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "chat"))
 		{
@@ -229,6 +245,34 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			jReceiveObject.GetString("name", sName, sizeof(sName));
 
 			BroadcastAdminMessage(sName, sMessage);
+		}
+		else if (StrEqual(sType, "refresh"))
+		{
+			char sHostname[128];
+			char sMapname[128];
+
+			g_cHostName.GetString(sHostname, sizeof(sHostname));
+
+			GetCurrentMap(sMapname, sizeof(sMapname));
+
+			JSONObject jRefreshObject = new JSONObject();
+
+			jRefreshObject.SetString("type", "refresh");
+
+			jRefreshObject.SetString("hostname", sHostname);
+			jRefreshObject.SetString("ip", g_sServerIP);
+			jRefreshObject.SetString("map", sMapname);
+
+			jRefreshObject.SetInt("maxPlayers", GetMaxHumanPlayers());
+			jRefreshObject.SetInt("players", GetClientCount(false));
+
+			char sRequest[512];
+
+			jRefreshObject.ToString(sRequest, sizeof(sRequest));
+
+			delete jRefreshObject;
+
+			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "report"))
 		{
@@ -275,8 +319,14 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			jPlayersObject.SetString("ip", g_sServerIP);
 			jPlayersObject.Set("players", jPlayersArray);
 
+			char sRequest[4096];
+
+			jPlayersObject.ToString(sRequest, sizeof(sRequest));
+
 			delete jPlayersArray;
 			delete jPlayersObject;
+
+			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "error"))
 		{
@@ -334,29 +384,6 @@ public void PushRequest(char[] sBuffer, int iSize)
 	g_aCommandQueue.PushString(sBuffer);
 
 	ProcessSocketOutbound();
-}
-
-public void SendAuthRequest()
-{
-	char sHostname[128];
-	char sPassword[64];
-
-	g_cHostName.GetString(sHostname, sizeof(sHostname));
-	g_cSocketPassword.GetString(sPassword, sizeof(sPassword));
-
-	JSONObject jAuthObject = new JSONObject();
-
-	jAuthObject.SetString("type", "auth");
-	jAuthObject.SetString("password", sPassword);
-	jAuthObject.SetString("hostname", sHostname);
-
-	char sRequest[512];
-
-	jAuthObject.ToString(sRequest, sizeof(sRequest));
-
-	delete jAuthObject;
-
-	PushRequest(sRequest, sizeof(sRequest));
 }
 
 /**
