@@ -9,4 +9,16 @@
     {
         "en"        "[{GREEN}SourceAdmin{WHITE}]"
     }
+    "ReportCreated"
+    {
+        "en"        "Report submitted."
+    }
+    "SelectClient"
+    {
+        "en"        "Select Client:"
+    }
+    "SelectReason"
+    {
+        "en"        "Select Reason:"
+    }
 }

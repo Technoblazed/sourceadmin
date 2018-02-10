@@ -18,39 +18,41 @@ ConVar g_cSocketAddress;
 ConVar g_cSocketMaxRetries;
 ConVar g_cSocketPassword;
 ConVar g_cSocketPort;
+ConVar g_cReportImmunity;
 
 int g_iRetries;
+int g_iReportTarget[MAXPLAYERS + 1];
 
 static char g_sColorNames[][] =
 {
-    "{WHITE}",
-    "{DARK_RED}",
-    "{PINK}",
-    "{GREEN}",
-    "{YELLOW}",
-    "{LIGHT_GREEN}",
-    "{LIGHT_RED}",
-    "{GRAY}",
-    "{ORANGE}",
-    "{LIGHT_BLUE}",
-    "{DARK_BLUE}",
-    "{PURPLE}"
+	"{WHITE}",
+	"{DARK_RED}",
+	"{PINK}",
+	"{GREEN}",
+	"{YELLOW}",
+	"{LIGHT_GREEN}",
+	"{LIGHT_RED}",
+	"{GRAY}",
+	"{ORANGE}",
+	"{LIGHT_BLUE}",
+	"{DARK_BLUE}",
+	"{PURPLE}"
 };
 
 static char g_sColorCodes[][] =
 {
-    "\x01",
-    "\x02",
-    "\x03",
-    "\x04",
-    "\x05",
-    "\x06",
-    "\x07",
-    "\x08",
-    "\x09",
-    "\x0B",
-    "\x0C",
-    "\x0E"
+	"\x01",
+	"\x02",
+	"\x03",
+	"\x04",
+	"\x05",
+	"\x06",
+	"\x07",
+	"\x08",
+	"\x09",
+	"\x0B",
+	"\x0C",
+	"\x0E"
 };
 
 enum SocketStatus
@@ -87,6 +89,7 @@ public void OnPluginStart()
 	g_cSocketMaxRetries = CreateConVar("sm_sourceadmin_max_retries", "30", "Maximum amount of times the server will attempt to reconnect to the socket server", _, true, 0.0);
 	g_cSocketPassword = CreateConVar("sm_sourceadmin_password", "magicalbacon", "Password for the SourceAdmin server");
 	g_cSocketPort = CreateConVar("sm_sourceadmin_port", "19857", "Port of the SourceAdmin server", _, true, 1.0);
+	g_cReportImmunity = CreateConVar("sm_sourceadmin_immunity", "2", "Determines admin immunity to the report feature.\n0) Admins cannot be reported and will not be displayed inside the report menu.\n1) Admins can be reported in the same way as other players.\n2) Admins will be displayed in the report menu, but reports will not be sent", _, true, 0.0, true, 2.0);
 
 	AutoExecConfig(true, "sourceadmin");
 
@@ -104,10 +107,11 @@ public void OnPluginStart()
 	BuildPath(Path_SM, g_sReasonsFile, sizeof(g_sReasonsFile), "configs/sourceadmin_reasons.cfg");
 
 	if (!FileExists(g_sReasonsFile, false, "GAME"))
-    {
-        GenerateReasonFile();
-    }
+	{
+		GenerateReasonFile();
+	}
 
+	BuildIP();
 	ParseReasonsFile();
 }
 
@@ -299,7 +303,89 @@ public void SendAuthRequest()
 
 public Action Command_Report(int client, int args)
 {
+	Menu mReportMenu = new Menu(ReportMenuHandler);
+
+	mReportMenu.SetTitle("%T", "SelectClient", client);
+
+	char sName[MAX_NAME_LENGTH];
+	char sSerial[24];
+
+	for (int i; i <= MaxClients; i++)
+	{
+		if (IsValidClient(i) && g_cReportImmunity.IntValue != 0)
+		{
+			GetClientName(i, sName, sizeof(sName));
+
+			Format(sSerial, sizeof(sSerial), "%d", GetClientSerial(i));
+
+			mReportMenu.AddItem(sSerial, sName);
+		}
+	}
+
 	return Plugin_Handled;
+}
+
+public int ReportMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[24];
+
+		int iSerial;
+		int iTarget;
+
+		menu.GetItem(param2, sInfo, sizeof(sInfo));
+
+		iSerial = StringToInt(sInfo);
+		iTarget = GetClientFromSerial(iSerial);
+
+		g_iReportTarget[param1] = iTarget;
+
+		DrawBanReasons(param1);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
+}
+
+public void DrawBanReasons(int client)
+{
+	Menu mReasonsMenu = new Menu(ReasonsMenuHandler);
+
+	mReasonsMenu.SetTitle("%T", "SelectReason", client);
+
+	char sReason[128];
+
+	int index;
+
+	for (int i; i <= g_aReasons.Length; i++)
+	{
+		g_aReasons.GetString(i, sReason, sizeof(sReason));
+
+		if (strlen(sReason) < 3)
+		{
+			continue;
+		}
+
+		mReasonsMenu.AddItem(sReason[index], sReason[index]);
+	}
+}
+
+public int ReasonsMenuHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[24];
+
+		menu.GetItem(param2, sInfo, sizeof(sInfo));
+
+		CreateReport(param1, g_iReportTarget[param1], sInfo);
+	}
+	else if (action == MenuAction_End)
+	{
+		delete menu;
+	}
 }
 
 /**
@@ -381,6 +467,77 @@ public void BroadcastAdminMessage(const char[] sName, const char[] sMessage)
 	Colorize(sPrefix, sizeof(sPrefix));
 
 	PrintToChatAll("%s %s", sPrefix, sMessage);
+}
+
+public void SourceAdmin_PrintToChat(int client, const char[] format, any:...)
+{
+ 	if (!IsValidClient(client))
+ 	{
+	 	return;
+ 	}
+
+  	char buffer[1024];
+  	int bytesWritten = 0;
+
+  	SetGlobalTransTarget(client);
+  	FormatNativeString(0, 2, 3, sizeof(buffer), bytesWritten, buffer);
+
+  	char sMessage[1024];
+
+	Format(sMessage, sizeof(sMessage), "%T %s", "Prefix", client, buffer);
+
+  	if (client == 0)
+	{
+		Colorize(sMessage, sizeof(sMessage));
+
+		PrintToConsole(client, sMessage);
+  	}
+	else if (IsClientInGame(client))
+	{
+		Colorize(sMessage, sizeof(sMessage));
+
+		PrintToChat(client, sMessage);
+  	}
+}
+
+/**
+ *	Report Processing
+ */
+
+public void CreateReport(int iClient, int iTarget, const char[] sReason)
+{
+	char sClientAuth[32];
+	char sClientName[MAX_NAME_LENGTH];
+
+	char sTargetAuth[32];
+	char sTargetName[MAX_NAME_LENGTH];
+
+	GetClientName(iClient, sClientName, sizeof(sClientName));
+	GetClientName(iTarget, sTargetName, sizeof(sTargetName));
+
+	GetClientAuthId(iClient, AuthId_SteamID64, sClientAuth, sizeof(sClientAuth));
+	GetClientAuthId(iTarget, AuthId_SteamID64, sTargetAuth, sizeof(sTargetAuth));
+
+	JSONObject jReportObject = new JSONObject();
+
+	jReportObject.SetString("cName", sClientName);
+	jReportObject.SetString("tName", sTargetName);
+
+	jReportObject.SetString("cAuth", sClientAuth);
+	jReportObject.SetString("tAuth", sTargetAuth);
+
+	jReportObject.SetString("ip", g_sServerIP);
+	jReportObject.SetString("reason", sReason);
+
+	char sRequest[512];
+
+	jReportObject.ToString(sRequest, sizeof(sRequest));
+
+	delete jReportObject;
+
+	PushRequest(sRequest, sizeof(sRequest));
+
+	SourceAdmin_PrintToChat(iClient, "%T", "ReportCreated", iClient);
 }
 
 /**
