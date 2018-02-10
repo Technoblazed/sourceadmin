@@ -56,7 +56,6 @@ net.createServer((connection) => {
         });
       }
       case 'report': {
-        console.log(line);
         return self.broadcast({
           type: 'report',
           cName: data.cName,
