@@ -16,7 +16,7 @@ before_script:
   - 'git clone https://github.com/splewis/sm-builder'
   - 'cd sm-builder'
   - 'pip install -r requirements.txt'
-  - 'python setup.py install --prefix=~/.local'
+  - 'python3 setup.py install --prefix=~/.local'
   - 'cd .. && mkdir sm && cd sm/'
   - 'SMPACKAGE="http://sourcemod.net/latest.php?os=linux&version=${SMVERSION}"'
   - 'wget $SMPACKAGE && tar xfz $(basename $SMPACKAGE)'
