@@ -528,6 +528,7 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 
 	jReportObject.SetString("ip", g_sServerIP);
 	jReportObject.SetString("reason", sReason);
+	jReportObject.SetString("type", "report");
 
 	char sRequest[512];
 
