@@ -273,6 +273,27 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			delete jResponseObject;
 		}
+		else if (StrEqual(sType, "rcon"))
+		{
+			char sAuth[18];
+			char sCommand[256];
+			char sResult[256];
+
+			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("command", sCommand, sizeof(sCommand));
+
+			ServerCommandEx(sResult, sizeof(sResult), "sm_rcon %s", sCommand);
+
+			JSONObject jResponseObject = new JSONObject();
+
+			jResponseObject.SetString("type", "map");
+			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("response", sResult);
+
+			PushRequest(jResponseObject);
+
+			delete jResponseObject;
+		}
 		else if (StrEqual(sType, "refresh"))
 		{
 			char sHostname[128];

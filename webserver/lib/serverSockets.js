@@ -98,6 +98,16 @@ net.createServer((connection) => {
         }
         */
       }
+      case 'rcon': {
+        return;
+        /*
+        {
+          type: "rcon",
+          auth: data.auth,
+          response: data.bool
+        }
+        */
+      }
       case 'refresh': {
         delete data.type;
 
