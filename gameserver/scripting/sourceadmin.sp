@@ -242,6 +242,27 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			BroadcastAdminMessage(sName, sMessage);
 		}
+		else if (StrEqual(sType, "cvar"))
+		{
+			char sAuth[18];
+			char sCvar[256];
+			char sResult[256];
+
+			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("cvar", sCvar, sizeof(sCvar));
+
+			ServerCommandEx(sResult, sizeof(sResult), "sm_cvar %s", sCvar);
+
+			JSONObject jResponseObject = new JSONObject();
+
+			jResponseObject.SetString("type", "map");
+			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("response", sResult);
+
+			PushRequest(jResponseObject);
+
+			delete jResponseObject;
+		}
 		else if (StrEqual(sType, "map"))
 		{
 			char sAuth[18];
