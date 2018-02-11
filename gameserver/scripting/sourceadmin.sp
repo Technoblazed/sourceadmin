@@ -263,6 +263,29 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			delete jResponseObject;
 		}
+		else if (StrEqual(sType, "kick"))
+		{
+			char sAuth[18];
+			char sReason[64];
+			char sResult[256];
+
+			int iTarget;
+
+			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetInt("target", iTarget);
+
+			ServerCommandEx(sResult, sizeof(sResult), "sm_kick #%i %s", iTarget, sReason);
+
+			JSONObject jResponseObject = new JSONObject();
+
+			jResponseObject.SetString("type", "kick");
+			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("response", sResult);
+
+			PushRequest(jResponseObject);
+
+			delete jResponseObject;
+		}
 		else if (StrEqual(sType, "map"))
 		{
 			char sAuth[18];

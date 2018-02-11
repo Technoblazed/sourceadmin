@@ -87,6 +87,16 @@ net.createServer((connection) => {
         }
         */
       }
+      case 'kick': {
+        return;
+        /*
+        {
+          type: "cvar",
+          auth: data.auth,
+          response: data.bool
+        }
+        */
+      }
       case 'map': {
         return;
         /*
