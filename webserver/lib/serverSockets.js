@@ -2,6 +2,7 @@ const _ = require('lodash');
 const carrier = require('carrier');
 const config = require('../config');
 const net = require('net');
+const utils = require('./utils');
 
 const serverData = {};
 const serverList = [];
@@ -73,6 +74,16 @@ net.createServer((connection) => {
           message: data.message,
           name: data.name,
           steam: data.steam
+        }
+        */
+      }
+      case 'map': {
+        return;
+        /*
+        {
+          type: "map",
+          auth: data.auth,
+          success: data.bool
         }
         */
       }

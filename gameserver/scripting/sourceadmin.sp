@@ -228,13 +228,9 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			jAuthObject.SetString("password", sLocalPassword);
 			jAuthObject.SetString("hostname", sHostname);
 
-			char sRequest[512];
-
-			jAuthObject.ToString(sRequest, sizeof(sRequest));
+			PushRequest(jAuthObject);
 
 			delete jAuthObject;
-
-			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "chat"))
 		{
@@ -246,10 +242,41 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			BroadcastAdminMessage(sName, sMessage);
 		}
+		else if (StrEqual(sType, "map"))
+		{
+			char sAuth[18];
+			char sMapname[PLATFORM_MAX_PATH];
+			char sReason[64];
+
+			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("map", sMapname, sizeof(sMapname));
+
+			JSONObject jResponseObject = new JSONObject();
+
+			jResponseObject.SetString("type", "map");
+			jResponseObject.SetString("auth", sAuth);
+
+			if (IsMapValid(sMapname))
+			{
+				jResponseObject.SetBool("success", true);
+
+				Format(sReason, sizeof(sReason), "SourceAdmin: sm_map - %s", sAuth);
+
+				ForceChangeLevel(sMapname, sReason);
+			}
+			else
+			{
+				jResponseObject.SetBool("success", false);
+			}
+
+			PushRequest(jResponseObject);
+
+			delete jResponseObject;
+		}
 		else if (StrEqual(sType, "refresh"))
 		{
 			char sHostname[128];
-			char sMapname[128];
+			char sMapname[PLATFORM_MAX_PATH];
 
 			g_cHostName.GetString(sHostname, sizeof(sHostname));
 
@@ -265,13 +292,9 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			jRefreshObject.SetInt("maxPlayers", GetMaxHumanPlayers());
 			jRefreshObject.SetInt("players", GetClientCount(false));
 
-			char sRequest[512];
-
-			jRefreshObject.ToString(sRequest, sizeof(sRequest));
+			PushRequest(jRefreshObject);
 
 			delete jRefreshObject;
-
-			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "players"))
 		{
@@ -309,14 +332,10 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jPlayersObject.Set("players", jPlayersArray);
 
-			char sRequest[4096];
-
-			jPlayersObject.ToString(sRequest, sizeof(sRequest));
+			PushRequest(jPlayersObject);
 
 			delete jPlayersArray;
 			delete jPlayersObject;
-
-			PushRequest(sRequest, sizeof(sRequest));
 		}
 		else if (StrEqual(sType, "error"))
 		{
@@ -363,13 +382,13 @@ public void ProcessSocketOutbound()
 	}
 }
 
-public void PushRequest(char[] sBuffer, int iSize)
+public void PushRequest(JSONObject jObject)
 {
-	ReplaceString(sBuffer, iSize, "\n", "", true);
-	ReplaceString(sBuffer, iSize, "\r", "", true);
-	ReplaceString(sBuffer, iSize, "\x09", "", true);
+	char sBuffer[4096];
 
-	StrCat(sBuffer, iSize, "\n");
+	jObject.ToString(sBuffer, sizeof(sBuffer));
+
+	StrCat(sBuffer, sizeof(sBuffer), "\n");
 
 	g_aCommandQueue.PushString(sBuffer);
 
@@ -591,13 +610,9 @@ public void OnChatMessage(int iClient, char[] sMessage, int iType)
 	jChatObject.SetString("name", sName);
 	jChatObject.SetString("steam", sSteamID);
 
-	char sRequest[512];
-
-	jChatObject.ToString(sRequest, sizeof(sRequest));
+	PushRequest(jChatObject);
 
 	delete jChatObject;
-
-	PushRequest(sRequest, sizeof(sRequest));
 }
 
 public void BroadcastAdminMessage(const char[] sName, const char[] sMessage)
@@ -681,16 +696,12 @@ public void CreateReport(int iClient, int iTarget, const char[] sReason)
 	jReportObject.SetString("cName", sClientName);
 	jReportObject.SetString("tName", sTargetName);
 
-	char sRequest[512];
-
-	jReportObject.ToString(sRequest, sizeof(sRequest));
-
-	delete jReportObject;
-
 	if (!CheckCommandAccess(iTarget, "sourceadmin_command", ADMFLAG_GENERIC) || g_cReportImmunity.IntValue == 1)
 	{
-		PushRequest(sRequest, sizeof(sRequest));
+		PushRequest(jReportObject);
 	}
+
+	delete jReportObject;
 
 	SourceAdmin_PrintToChat(iClient, "%T", "ReportCreated", iClient, sTargetName);
 }
