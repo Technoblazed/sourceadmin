@@ -9,6 +9,7 @@
     "lint": "eslint --ext .js .",
     "clean": "rm -rf public/*",
     "build": "webpack --config webpack.prod.config.js",
+    "analyze": "webpack --config webpack.analyze.config.js",
     "prod-win": "npm run build && set NODE_ENV=production && node app.js",
     "prod": "npm run build && NODE_ENV=production nodejs app.js"
   },
@@ -48,6 +49,7 @@
     "style-loader": "^0.20.1",
     "url-loader": "^0.6.2",
     "webpack": "^3.10.0",
+    "webpack-bundle-analyzer": "^2.10.0",
     "webpack-dev-middleware": "^2.0.4",
     "webpack-hot-middleware": "^2.21.0"
   }
