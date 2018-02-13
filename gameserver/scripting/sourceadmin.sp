@@ -269,10 +269,9 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sReason[64];
 			char sResult[256];
 
-			int iTarget;
-
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
-			jReceiveObject.GetInt("target", iTarget);
+
+			int iTarget = jReceiveObject.GetInt("target");
 
 			ServerCommandEx(sResult, sizeof(sResult), "sm_kick #%i %s", iTarget, sReason);
 
