@@ -8,5 +8,13 @@ module.exports = {
   socket: {
     password: 'magicalbacon',
     port: 19857
+  },
+  steam: {
+    baseURL: '',
+    apiKey: ''
+  },
+  webserver: {
+    port: 3000,
+    sessionSecret: ''
   }
 };

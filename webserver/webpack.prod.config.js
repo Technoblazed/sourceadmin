@@ -19,64 +19,19 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(css|scss)$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: 'css-loader'
         })
       },
       {
-        test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
+        test: /\.(png|woff|woff2|eot|ttf|svg|ico|otf)$/,
+        loader: 'url-loader?limit=100000'
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      {
-        test: /\.svg$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'image/svg+xml',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.svg'
-        }
-      },
-      {
-        test: /\.woff$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/font-woff',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff'
-        }
-      },
-      {
-        test: /\.woff2$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/font-woff2',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff2'
-        }
-      },
-      {
-        test: /\.[ot]tf$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/octet-stream',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.ttf'
-        }
-      },
-      {
-        test: /\.eot$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/vnd.ms-fontobject',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.eot'
-        }
+        test: /\.ico$/,
+        loader: 'file-loader?name=[name].[ext]'
       }
     ]
   },

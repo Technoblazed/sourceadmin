@@ -5,13 +5,13 @@
   "main": "app.js",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon bin/www",
     "lint": "eslint --ext .js .",
     "clean": "rm -rf public/*",
     "build": "webpack --config webpack.prod.config.js",
     "analyze": "webpack --config webpack.analyze.config.js",
-    "prod-win": "npm run build && set NODE_ENV=production && node app.js",
-    "prod": "npm run build && NODE_ENV=production nodejs app.js"
+    "prod-win": "npm run build && set NODE_ENV=production && node bin/www",
+    "prod": "npm run build && NODE_ENV=production nodejs bin/www"
   },
   "repository": {
     "type": "git",
@@ -24,14 +24,27 @@
   },
   "homepage": "https://github.com/technoblazed/sourceadmin#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "carrier": "^0.3.0",
+    "connect-ensure-login": "^0.1.1",
+    "connect-session-sequelize": "^5.2.0",
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.1.0",
+    "express": "^4.16.2",
+    "express-nunjucks": "^2.2.3",
+    "express-session": "^1.15.6",
     "fs": "0.0.1-security",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
+    "morgan": "^1.9.0",
     "mysql2": "^1.5.2",
+    "nunjucks": "^3.0.1",
+    "passport": "^0.4.0",
+    "passport-steam": "^1.0.8",
     "path": "^0.12.7",
     "requestretry": "^1.13.0",
-    "sequelize": "^4.33.0"
+    "sequelize": "^4.33.0",
+    "serve-favicon": "^2.4.5"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",
@@ -41,6 +54,7 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.6",
     "glob-all": "^3.1.0",
+    "image-webpack-loader": "^4.1.0",
     "jquery": "^3.3.1",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "purify-css": "^1.2.5",

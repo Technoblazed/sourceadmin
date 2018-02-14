@@ -14,56 +14,19 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.(css|scss)$/,
         use: [
           'style-loader',
           'css-loader'
         ]
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      { test: /\.svg$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'image/svg+xml',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.svg'
-        }
+        test: /\.(png|woff|woff2|eot|ttf|svg|otf)$/,
+        loader: 'url-loader?limit=100000'
       },
       {
-        test: /\.woff$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/font-woff',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff'
-        }
-      },
-      {
-        test: /\.woff2$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/font-woff2',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.woff2'
-        }
-      },
-      {
-        test: /\.[ot]tf$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/octet-stream',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.ttf'
-        }
-      },
-      {
-        test: /\.eot$/,
-        loader: 'url-loader',
-        query: {
-          mimetype: 'application/vnd.ms-fontobject',
-          name: './client/src/css/semantic/themes/default/assets/fonts/icons.eot'
-        }
+        test: /\.ico$/,
+        loader: 'file-loader?name=[name].[ext]'
       }
     ]
   },
