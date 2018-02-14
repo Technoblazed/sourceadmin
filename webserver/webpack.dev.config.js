@@ -1,3 +1,4 @@
+const config = require('./config');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -32,6 +33,9 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.DefinePlugin({
+      'BASE_URL': config.steam.baseURL
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ]

@@ -2,26 +2,24 @@
  *  Global Requirements
  */
 
-const _ = require('lodash');
 const config = require('./config');
 const db = require('./models');
 
-
 /**
- *  Gameserver Management
+ *  Gameserver Socket Management
  */
 
 const carrier = require('carrier');
 const net = require('net');
-const sockets = require('./lib/sockets');
+const gamesockets = require('./lib/gamesockets');
 
 net.createServer((connection) => {
-  sockets.writeData(connection, {
+  gamesockets.writeData(connection, {
     type: 'auth'
   });
 
   connection.on('close', () => {
-    sockets.deleteConnection(connection);
+    gamesockets.deleteConnection(connection);
   });
 
   connection.on('error', (error) => {
@@ -38,12 +36,12 @@ net.createServer((connection) => {
       return;
     }
 
-    if (!sockets.connectionExists(connection)) {
+    if (!gamesockets.connectionExists(connection)) {
       if (data.type === 'auth') {
         if (data.password === config.socket.password) {
-          return sockets.addConnection(connection);
+          return gamesockets.addConnection(connection);
         } else {
-          return sockets.writeData(connection, {
+          return gamesockets.writeData(connection, {
             type: 'error',
             data: 'Invalid socket password specified!'
           });
@@ -56,9 +54,9 @@ net.createServer((connection) => {
     switch (data.type) {
       case 'chat':
       case 'chat_team': {
-        sockets.checkMessageLimit(connection);
+        gamesockets.checkMessageLimit(connection);
 
-        return sockets.addMessage(connection, data);
+        return gamesockets.addMessage(connection, data);
         /*
         {
             type: 'chat',
@@ -102,7 +100,7 @@ net.createServer((connection) => {
       case 'refresh': {
         delete data.type;
 
-        return sockets.updateData(connection, data);
+        return gamesockets.updateData(connection, data);
         /*
         {
             type: data.type,
@@ -148,7 +146,7 @@ net.createServer((connection) => {
 }).listen(config.socket.port || 19857);
 
 /**
- *  Webserver Managment
+ *  Webserver Management
  */
 
 const bodyParser = require('body-parser');
@@ -164,6 +162,7 @@ const session = require('express-session');
 const sequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const app = express();
+const server = require('http').createServer(app);
 
 const isDev = app.get('env') !== 'production';
 
@@ -298,4 +297,39 @@ app.use((err, req, res) => {
   });
 });
 
-module.exports = app;
+module.exports = { app, server };
+
+/**
+ *  Webserver Socket Management
+ */
+
+const WebSocket = require('ws');
+const websockets = require('./lib/websockets');
+
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (connection, req) => {
+  websockets.addConnection(connection, req);
+
+  console.log('Added connection');
+
+  connection.on('close', () => {
+    websockets.deleteConnection(connection);
+
+    console.log('disconnected');
+  });
+
+  connection.on('error', () => {
+  });
+
+  connection.on('message', (message) => {
+    console.log(`Received: ${message}`);
+
+    setInterval(() => {
+      if (connection.readyState === WebSocket.OPEN) {
+        console.log(connection.uuid);
+        connection.send(`${new Date()}`);
+      }
+    }, 1000);
+  });
+});

@@ -33,6 +33,7 @@
     "express": "^4.16.2",
     "express-nunjucks": "^2.2.3",
     "express-session": "^1.15.6",
+    "express-ws": "^3.0.0",
     "fs": "0.0.1-security",
     "lodash": "^4.17.5",
     "moment": "^2.20.1",
@@ -44,7 +45,10 @@
     "path": "^0.12.7",
     "requestretry": "^1.13.0",
     "sequelize": "^4.33.0",
-    "serve-favicon": "^2.4.5"
+    "serve-favicon": "^2.4.5",
+    "url": "^0.11.0",
+    "uuid": "^3.2.1",
+    "ws": "^4.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.1",

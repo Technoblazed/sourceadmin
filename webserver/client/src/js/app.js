@@ -17,3 +17,21 @@ import '../css/app.css';
  */
 
 import '../images/favicon.ico';
+
+/*
+ *  Javascript
+ */
+
+const ws = new WebSocket(`ws://${BASE_URL}`);
+
+ws.onopen = function() {
+  console.log('websocket is connected ...');
+
+  ws.send('connected');
+};
+
+ws.onmessage = function(message) {
+  console.log(message);
+};
+
+// ADD AUTO RECONNECT

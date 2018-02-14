@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-const app = require('../app');
+const app = require('../app').app;
 const config = require('../config');
 const db = require('../models');
 const debug = require('debug')('sourceadmin:server');
-const http = require('http');
+const server = require('../app').server;
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -23,8 +23,6 @@ function normalizePort(val) {
 const port = normalizePort(config.webserver.port || '3000');
 
 app.set('port', port);
-
-const server = http.createServer(app);
 
 function onError(error) {
   if (error.syscall !== 'listen') {

@@ -2,6 +2,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const config = require('./config');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -33,6 +34,9 @@ module.exports = {
   plugins: [
     new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(['client/public/assets']),
+    new webpack.DefinePlugin({
+      'BASE_URL': config.steam.baseURL
+    }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
