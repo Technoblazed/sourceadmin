@@ -394,7 +394,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jPlayersObject.SetString("type", "players");
 
-			jPlayersObject.Set("players", jPlayersArray);
+			jPlayersObject.Set("playerList", jPlayersArray);
 
 			PushRequest(jPlayersObject);
 
