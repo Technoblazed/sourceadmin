@@ -176,6 +176,7 @@ if (isDev) {
   const compiler = webpack(devBuildConfig);
 
   app.use(webpackDevMiddleware(compiler, {
+    filename: 'app.min.js',
     publicPath: devBuildConfig.output.publicPath,
     hot: true,
     historyApiFallback: true,
@@ -196,7 +197,11 @@ if (isDev) {
     }
   }));
 
-  app.use(webpackHotMiddleware(compiler));
+  app.use(webpackHotMiddleware(compiler, {
+    log: console.log,
+    path: '/__webpack_hmr',
+    heartbeat: 10 * 1000
+  }));
 
   app.use(logger('dev'));
 }

@@ -3,11 +3,11 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    'webpack-hot-middleware/client?reload=true',
+    'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
     './client/src/js/app.js'
   ],
   output: {
-    filename: 'app.js',
+    filename: 'app.min.js',
     path: path.resolve(__dirname, 'client', 'public', 'assets'),
     publicPath: '/assets/'
   },
