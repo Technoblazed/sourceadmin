@@ -235,6 +235,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
+  res.locals.SITE_NAME = config.webserver.siteName,
   res.locals.IS_DEV = isDev;
   res.locals.USER = req.user;
   res.locals.PATH = req.url;

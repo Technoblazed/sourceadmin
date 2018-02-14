@@ -1,1 +1,36 @@
-login.njk
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="/assets/app.min.css">
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <title>{{ SITE_NAME }} - {{ PAGE_TITLE }}</title>
+
+    <style type="text/css">
+        body {
+          background-color: #DADADA;
+        }
+        body > .grid {
+          height: 100%;
+        }
+        .column {
+          max-width: 450px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ui middle aligned center aligned grid">
+  <div class="column">
+    <a class="ui fluid large black submit button" href="/auth/steam">Login with Steam</a>
+  </div>
+</div>
+
+<script src="/assets/app.min.js"></script>
+</body>
+</html>

@@ -1,9 +1,7 @@
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const PurifyCSSPlugin = require('purifycss-webpack');
 
-const glob = require('glob-all');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -53,12 +51,6 @@ module.exports = {
           removeAll: true
         }
       }
-    }),
-    new PurifyCSSPlugin({
-      paths: glob.sync([
-        path.join(__dirname, 'client', 'src', 'js', '*.js'),
-        path.join(__dirname, 'views', '*.njk')
-      ])
     })
   ]
 };

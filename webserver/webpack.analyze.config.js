@@ -1,10 +1,7 @@
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const PurifyCSSPlugin = require('purifycss-webpack');
 
-const glob = require('glob-all');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -21,10 +18,7 @@ module.exports = {
     rules: [
       {
         test: /\.(css|scss)$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader'
-        })
+        use: 'css-loader'
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg|ico|otf)$/,
@@ -39,7 +33,6 @@ module.exports = {
   plugins: [
     new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(['client/public/assets']),
-    new ExtractTextPlugin('app.min.css'),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
@@ -55,12 +48,6 @@ module.exports = {
           removeAll: true
         }
       }
-    }),
-    new PurifyCSSPlugin({
-      paths: glob.sync([
-        path.join(__dirname, 'client', 'src', 'js', '*.js'),
-        path.join(__dirname, 'views', '*.njk')
-      ])
     })
   ]
 };

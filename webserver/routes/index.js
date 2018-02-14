@@ -12,7 +12,9 @@ module.exports = () => {
   });
 
   router.get('/login', ensureNotLoggedIn, (req, res) => {
-    res.redirect('/auth/steam');
+    res.render('login', {
+      PAGE_TITLE: 'Login'
+    });
   });
 
   router.get('/logout', ensureLoggedIn, (req, res) => {
