@@ -3,12 +3,13 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const config = require('./config');
-const core = require('./webpack.core.config');
 const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: core.entryPoints.prod,
+  entry: [
+    './client/src/js/app.js'
+  ],
   output: {
     filename: 'app.min.js',
     path: path.resolve(__dirname, 'client', 'public', 'assets'),

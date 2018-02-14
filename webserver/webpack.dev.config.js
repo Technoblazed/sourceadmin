@@ -1,10 +1,12 @@
 const config = require('./config');
-const core = require('./webpack.core.config');
 const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  entry: core.entryPoints.dev,
+  entry: [
+    'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+    './client/src/js/app.js'
+  ],
   output: {
     filename: 'app.min.js',
     path: path.resolve(__dirname, 'client', 'public', 'assets'),
