@@ -22,6 +22,7 @@ import '../images/favicon.ico';
  *  Javascript
  */
 
+// eslint-disable-next-line no-undef
 const ws = new WebSocket(`ws://${BASE_URL}`);
 
 ws.onopen = function() {
