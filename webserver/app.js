@@ -123,10 +123,14 @@ passport.use(new steamStrategy({
       steamId: profile.id
     }
   }).spread((user) => user.updateAttributes({
-    steamAvatar: profile.id,
+    steamAvatar: profile.avatarfull,
     steamUsername: profile.displayName
   }).then(() => {
-    done(null, profile.id);
+    done(null, {
+      steamAvatar: profile._json.avatarfull,
+      steamId: profile.id,
+      steamUsername: profile.displayName
+    });
   }).catch((err) => {
     done(err);
   }));
@@ -136,8 +140,8 @@ passport.serializeUser((user, done) => {
   done(null, user);
 });
 
-passport.deserializeUser((id, done) => {
-  db.Users.findById(id).then((user) => {
+passport.deserializeUser((user, done) => {
+  db.Users.findById(user.steamId).then((user) => {
     done(null, user);
   }).catch((err) => {
     done(err);

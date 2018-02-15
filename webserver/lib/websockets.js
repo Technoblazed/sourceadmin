@@ -48,24 +48,43 @@ wss.on('connection', (connection, req) => {
   connection.on('message', (message) => {
     console.log(`${new Date()}: Received: ${message}`);
 
-    setInterval(() => {
-      if (connection.readyState === WebSocket.OPEN) {
-        connection.send(`${new Date()}`);
+    let data;
+
+    try {
+      data = JSON.parse(message);
+    } catch (e) {
+      console.log(e);
+
+      return;
+    }
+
+    switch (data.type) {
+      case 'pageLoad': {
+        return self.sendMessage(connection, {
+          type: 'pageLoad',
+          adminList: clientData
+        });
       }
-    }, 1000);
+    }
   });
 });
 
 const self = module.exports = {
   addConnection: (connection, req) => {
-    clientData.host = {};
+    const uuid = uuidv4();
+
+    clientData[uuid] = {
+      data: req.session.passport.user
+    };
 
     connection.location = url.parse(req.url, true);
-    connection.uuid = uuidv4();
+    connection.uuid = uuid;
 
     return clientList.push(connection);
   },
   deleteConnection: (connection) => {
+    delete clientData[connection.uuid];
+
     return clientList.splice(clientList.indexOf(connection), 1);
   },
   isOriginAllowed: (origin) => {
@@ -73,5 +92,10 @@ const self = module.exports = {
     const originHost = url.parse(origin, true).host;
 
     return baseHost === originHost;
+  },
+  sendMessage: (connection, message) => {
+    if (connection.readyState === WebSocket.OPEN) {
+      connection.send(JSON.stringify(message));
+    }
   }
 };

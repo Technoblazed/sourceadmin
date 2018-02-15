@@ -1,26 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+{% extends "main_index.njk" %}
 
-    {% if IS_DEV != true %}
-      <link rel="stylesheet" type="text/css" href="/assets/app.min.css">
-    {% endif %}
-
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-
-    <title>{{ SITE_NAME }} - {{ PAGE_TITLE }}</title>
-</head>
-<body>
-
-<div class="ui middle aligned center aligned grid loginDiv">
-  <div class="four wide column">
-    <a class="ui fluid large inverted white submit button" href="/auth/steam">HOMEPAGE</a>
+{% block content %}
+<div class="ui fixed inverted menu">
+  <div class="ui container fluid">
+    <a href="/" class="header item">{{ SITE_NAME }}</a>
+    <a href="/" class="item">Dashboard</a>
+    <a class="ui right item" href="/logout">Logout</a>
   </div>
 </div>
-
-<script src="/assets/app.min.js"></script>
-</body>
-</html>
+<div class="ui main container">
+  <div class="two column stackable ui grid">
+    <div class="row">
+      <div class="twelve wide column">
+        <div class="ui card fluid">
+          <div class="content">
+            Server List
+          </div>
+          <div class="content">
+          </div>
+        </div>
+      </div>
+      <div class="four wide column">
+        <div class="ui card fluid">
+          <div class="content">
+            Admins Online
+          </div>
+          <div class="content">
+            <table class="table" id="adminList">
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

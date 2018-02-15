@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include "inc/meta.njk" %}
+
+    {% if IS_DEV != true %}
+      <link rel="stylesheet" type="text/css" href="/assets/app.min.css">
+    {% endif %}
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <title>{{ SITE_NAME }} - {{ PAGE_TITLE }}</title>
+</head>
+<body>
+{% block content %}
+{% endblock %}
+<script src="/assets/app.min.js"></script>
+</body>
+</html>

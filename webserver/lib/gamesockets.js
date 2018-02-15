@@ -158,7 +158,7 @@ const self = module.exports = {
   addConnection: (connection) => {
     const host = `${connection.remoteAddress}:${connection.remotePort}`;
 
-    serverData.host = {};
+    serverData[host] = {};
     connection.name = host;
 
     return serverList.push(connection);
