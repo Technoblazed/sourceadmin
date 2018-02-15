@@ -274,6 +274,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sUUID[64];
 
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("reason", sReason, sizeof(sReason));
 			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
 
 			int iTarget = jReceiveObject.GetInt("target");
