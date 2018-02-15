@@ -123,7 +123,7 @@ passport.use(new steamStrategy({
       steamId: profile.id
     }
   }).spread((user) => user.updateAttributes({
-    steamAvatar: profile.avatarfull,
+    steamAvatar: profile._json.avatarfull,
     steamUsername: profile.displayName
   }).then(() => {
     done(null, {

@@ -6,6 +6,7 @@
 
 [![GitHub release](https://img.shields.io/github/release/technoblazed/sourceadmin.svg?style=flat-square&label=Latest%20Release&colorB=FF69B4)](https://github.com/Technoblazed/sourceadmin/releases/latest)
 [![GitHub Downloads](https://img.shields.io/github/downloads/technoblazed/sourceadmin/total.svg?style=flat-square&label=Downloads&colorB=FF69B4)](https://github.com/Technoblazed/sourceadmin/releases/latest)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/technoblazed/sourceadmin.svg?style=flat-square&label=Repo%20Size&colorB=FF69B4)](https://github.com/Technoblazed/sourceadmin)
 
 ### Repo
 
