@@ -72,6 +72,7 @@ net.createServer((connection) => {
         {
             type: "cvar",
             auth: data.auth,
+            uuid: data.uuid,
             response: data.bool
         }
         */
@@ -82,6 +83,7 @@ net.createServer((connection) => {
         {
             type: "cvar",
             auth: data.auth,
+            uuid: data.uuid,
             response: data.bool
         }
         */
@@ -92,6 +94,7 @@ net.createServer((connection) => {
         {
             type: "map",
             auth: data.auth,
+            uuid: data.uuid,
             success: data.bool
         }
         */
@@ -121,6 +124,7 @@ net.createServer((connection) => {
         {
             type: "rcon",
             auth: data.auth,
+            uuid: data.uuid,
             response: data.bool
         }
         */
