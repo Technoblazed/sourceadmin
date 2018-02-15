@@ -1,4 +1,5 @@
 const app = require('../app');
+const config = require('../config');
 const server = app.server;
 const sessionParser = app.sessionParser;
 const url = require('url');
@@ -14,30 +15,38 @@ const wss = new WebSocket.Server({
   verifyClient: (info, done) => {
     sessionParser(info.req, {}, () => {
       if (info.req.session.passport.user) {
-        done(true, 200);
+        done(true);
       } else {
-        done(false, 401);
+        done(false, 1008, 'User Not Authenticated');
       }
     });
   }
 });
 
 wss.on('connection', (connection, req) => {
+  if (!self.isOriginAllowed(req.headers.origin)) {
+    connection.close(1008, 'Invalid connection origin');
+
+    console.log(new Date() + ' Connection from origin ' + req.headers.origin + ' rejected.');
+
+    return;
+  }
+
   self.addConnection(connection, req);
 
-  console.log('Added connection');
+  console.log(`${new Date()}: Connection from origin ${req.headers.origin} added.`);
 
   connection.on('close', () => {
     self.deleteConnection(connection);
 
-    console.log('disconnected');
+    console.log(`${new Date()}: Connection from origin ${req.headers.origin} deleted.`);
   });
 
   connection.on('error', () => {
   });
 
   connection.on('message', (message) => {
-    console.log(`Received: ${message}`);
+    console.log(`${new Date()}: Received: ${message}`);
 
     setInterval(() => {
       if (connection.readyState === WebSocket.OPEN) {
@@ -58,5 +67,11 @@ const self = module.exports = {
   },
   deleteConnection: (connection) => {
     return clientList.splice(clientList.indexOf(connection), 1);
+  },
+  isOriginAllowed: (origin) => {
+    const baseHost = url.parse(config.steam.baseURL, true).host;
+    const originHost = url.parse(origin, true).host;
+
+    return baseHost === originHost;
   }
 };
