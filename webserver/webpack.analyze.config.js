@@ -4,6 +4,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const config = require('./config');
 const path = require('path');
+const url = require('url');
 const webpack = require('webpack');
 
 module.exports = {
@@ -35,7 +36,7 @@ module.exports = {
     new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(['client/public/assets']),
     new webpack.DefinePlugin({
-      'BASE_URL': config.steam.baseURL
+      'BASEURL_DATA': JSON.stringify(url.parse(config.steam.baseURL, true))
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {

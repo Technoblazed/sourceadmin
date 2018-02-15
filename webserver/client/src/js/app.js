@@ -22,8 +22,11 @@ import '../images/favicon.ico';
  *  Javascript
  */
 
+/* global BASEURL_DATA */
+const urlData = BASEURL_DATA;
+
 // eslint-disable-next-line no-undef
-const ws = new WebSocket(`ws://${BASE_URL}`);
+const ws = new WebSocket((urlData.protocol === 'http:' ? 'ws' : 'wss') + '://' + urlData.host);
 
 ws.onopen = function() {
   console.log('websocket is connected ...');

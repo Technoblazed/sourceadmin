@@ -2,7 +2,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const config = require('./config');
 const path = require('path');
+const url = require('url');
 const webpack = require('webpack');
 
 module.exports = {
@@ -36,6 +38,9 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(['client/public/assets']),
     new ExtractTextPlugin('app.min.css'),
+    new webpack.DefinePlugin({
+      'BASEURL_DATA': JSON.stringify(url.parse(config.steam.baseURL, true))
+    }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,

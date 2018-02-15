@@ -6,150 +6,6 @@ const config = require('./config');
 const db = require('./models');
 
 /**
- *  Gameserver Socket Management
- */
-
-const carrier = require('carrier');
-const net = require('net');
-const gamesockets = require('./lib/gamesockets');
-
-net.createServer((connection) => {
-  gamesockets.writeData(connection, {
-    type: 'auth'
-  });
-
-  connection.on('close', () => {
-    gamesockets.deleteConnection(connection);
-  });
-
-  connection.on('error', (error) => {
-  });
-
-  carrier.carry(connection, async(line) => {
-    let data;
-
-    try {
-      data = JSON.parse(line);
-    } catch (e) {
-      console.log(e);
-
-      return;
-    }
-
-    if (!gamesockets.connectionExists(connection)) {
-      if (data.type === 'auth') {
-        if (data.password === config.socket.password) {
-          return gamesockets.addConnection(connection);
-        } else {
-          return gamesockets.writeData(connection, {
-            type: 'error',
-            data: 'Invalid socket password specified!'
-          });
-        }
-      } else {
-        return;
-      }
-    }
-
-    switch (data.type) {
-      case 'chat':
-      case 'chat_team': {
-        gamesockets.checkMessageLimit(connection);
-
-        return gamesockets.addMessage(connection, data);
-        /*
-        {
-            type: 'chat',
-            message: data.message,
-            name: data.name,
-            steam: data.steam
-        }
-        */
-      }
-      case 'cvar': {
-        return;
-        /*
-        {
-            type: "cvar",
-            auth: data.auth,
-            uuid: data.uuid,
-            response: data.bool
-        }
-        */
-      }
-      case 'kick': {
-        return;
-        /*
-        {
-            type: "cvar",
-            auth: data.auth,
-            uuid: data.uuid,
-            response: data.bool
-        }
-        */
-      }
-      case 'map': {
-        return;
-        /*
-        {
-            type: "map",
-            auth: data.auth,
-            uuid: data.uuid,
-            success: data.bool
-        }
-        */
-      }
-      case 'players':
-      case 'refresh': {
-        delete data.type;
-
-        return gamesockets.updateData(connection, data);
-        /*
-        {
-            type: data.type,
-            playerList: data.players
-        }
-        {
-            type: data.type,
-            hostname: data.hostname,
-            map: data.map,
-            maxPlayers: data.maxPlayers,
-            players: data.players
-        }
-        */
-      }
-      case 'rcon': {
-        return;
-        /*
-        {
-            type: "rcon",
-            auth: data.auth,
-            uuid: data.uuid,
-            response: data.bool
-        }
-        */
-      }
-      case 'report': {
-        return;
-        /*
-        {
-            type: data.type,
-            ip: data.cAddress,
-            tAddress: data.tAddress,
-            cAuth: data.cAuth,
-            tAuth: data.tAuth,
-            cName: data.cName,
-            tName: data.tName,
-            sAddress: data.ip,
-            reason: data.reason
-        }
-        */
-      }
-    }
-  });
-}).listen(config.socket.port || 19857);
-
-/**
  *  Webserver Management
  */
 
@@ -168,7 +24,7 @@ const sequelizeStore = require('connect-session-sequelize')(session.Store);
 const app = express();
 const server = require('http').createServer(app);
 
-const isDev = app.get('env') !== 'production';
+const isDev = app.get('env').trim() !== 'production';
 
 if (isDev) {
   const webpack = require('webpack');
@@ -303,37 +159,5 @@ app.use((err, req, res) => {
 
 module.exports = { app, server };
 
-/**
- *  Webserver Socket Management
- */
-
-const WebSocket = require('ws');
-const websockets = require('./lib/websockets');
-
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (connection, req) => {
-  websockets.addConnection(connection, req);
-
-  console.log('Added connection');
-
-  connection.on('close', () => {
-    websockets.deleteConnection(connection);
-
-    console.log('disconnected');
-  });
-
-  connection.on('error', () => {
-  });
-
-  connection.on('message', (message) => {
-    console.log(`Received: ${message}`);
-
-    setInterval(() => {
-      if (connection.readyState === WebSocket.OPEN) {
-        console.log(connection.uuid);
-        connection.send(`${new Date()}`);
-      }
-    }, 1000);
-  });
-});
+require('./lib/gamesockets');
+require('./lib/websockets');

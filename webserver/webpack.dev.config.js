@@ -1,5 +1,6 @@
 const config = require('./config');
 const path = require('path');
+const url = require('url');
 const webpack = require('webpack');
 
 module.exports = {
@@ -34,7 +35,7 @@ module.exports = {
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
-      'BASE_URL': config.steam.baseURL
+      'BASEURL_DATA': JSON.stringify(url.parse(config.steam.baseURL, true))
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
