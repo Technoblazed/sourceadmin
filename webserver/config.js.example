@@ -15,6 +15,7 @@ module.exports = {
   },
   webserver: {
     port: 3000,
-    sessionSecret: ''
+    sessionSecret: '',
+    siteName: 'SourceAdmin'
   }
 };

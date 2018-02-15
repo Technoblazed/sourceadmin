@@ -1,4 +1,6 @@
-const server = require('../app').server;
+const app = require('../app');
+const server = app.server;
+const sessionParser = app.sessionParser;
 const url = require('url');
 const uuidv4 = require('uuid/v4');
 
@@ -7,7 +9,18 @@ const clientList = [];
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({
+  server,
+  verifyClient: (info, done) => {
+    sessionParser(info.req, {}, () => {
+      if (info.req.session.passport.user) {
+        done(true, 200);
+      } else {
+        done(false, 401);
+      }
+    });
+  }
+});
 
 wss.on('connection', (connection, req) => {
   self.addConnection(connection, req);
@@ -28,7 +41,6 @@ wss.on('connection', (connection, req) => {
 
     setInterval(() => {
       if (connection.readyState === WebSocket.OPEN) {
-        console.log(connection.uuid);
         connection.send(`${new Date()}`);
       }
     }, 1000);

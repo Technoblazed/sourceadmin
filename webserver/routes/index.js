@@ -8,7 +8,9 @@ const router = express.Router();
 
 module.exports = () => {
   router.get('/', ensureLoggedIn, (req, res) => {
-    res.render('index', {});
+    res.render('index', {
+      PAGE_TITLE: 'Home'
+    });
   });
 
   router.get('/login', ensureNotLoggedIn, (req, res) => {

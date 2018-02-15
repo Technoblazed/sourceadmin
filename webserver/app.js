@@ -79,12 +79,13 @@ app.use('/assets', express.static(path.join(__dirname, 'client', 'public', 'asse
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-  extended: false
+  extended: true
 }));
 
 app.use(cookieParser());
 
-app.use(session({
+
+const sessionParser = session({
   secret: config.webserver.sessionSecret,
   saveUninitialized: true,
   resave: true,
@@ -93,7 +94,9 @@ app.use(session({
     db: db.sequelize,
     expiration: 4 * 7 * 24 * 60 * 60 * 1000
   })
-}));
+});
+
+app.use(sessionParser);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -117,7 +120,7 @@ passport.use(new steamStrategy({
 }, (identifier, profile, done) => {
   db.Users.findOrCreate({
     where: {
-      steamId: profile._json.steamid
+      steamId: profile.id
     }
   }).spread((user) => user.updateAttributes({
     steamAvatar: profile.id,
@@ -157,7 +160,7 @@ app.use((err, req, res) => {
   });
 });
 
-module.exports = { app, server };
+module.exports = { app, server, sessionParser };
 
 require('./lib/gamesockets');
 require('./lib/websockets');
