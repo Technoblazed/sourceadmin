@@ -44,7 +44,7 @@
     "passport-steam": "^1.0.8",
     "path": "^0.12.7",
     "requestretry": "^1.13.0",
-    "sequelize": "^4.33.0",
+    "sequelize": "^4.33.4",
     "serve-favicon": "^2.4.5",
     "url": "^0.11.0",
     "uuid": "^3.2.1",
@@ -66,9 +66,9 @@
     "semantic-ui-css": "^2.2.14",
     "style-loader": "^0.20.1",
     "url-loader": "^0.6.2",
-    "webpack": "^3.10.0",
+    "webpack": "^3.11.0",
     "webpack-bundle-analyzer": "^2.10.0",
-    "webpack-dev-middleware": "^2.0.4",
+    "webpack-dev-middleware": "^2.0.5",
     "webpack-hot-middleware": "^2.21.0"
   }
 }
