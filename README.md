@@ -16,6 +16,6 @@
 
 ### Quality
 
-[![Languages](https://img.shields.io/github/languages/count/technoblazed/sourceadmin.svg?style=flat-square&label=Languages&colorB=green)]()
+[![Languages](https://img.shields.io/github/languages/count/technoblazed/sourceadmin.svg?style=flat-square&label=Languages&colorB=green)](https://github.com/Technoblazed/sourceadmin)
 [![Travis](https://img.shields.io/travis/Technoblazed/sourceadmin.svg?style=flat-square&label=TravisCI%20Build)](https://travis-ci.org/Technoblazed/sourceadmin)
 [![Codacy](https://img.shields.io/codacy/grade/7f2feef106234b6ea78410ad10cc3ef3.svg?style=flat-square&label=Code%20Quality)](https://www.codacy.com/app/technoblazed/sourceadmin)
