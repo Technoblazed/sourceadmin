@@ -247,9 +247,11 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sAuth[18];
 			char sCvar[256];
 			char sResult[256];
+			char sUUID[64];
 
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
 			jReceiveObject.GetString("cvar", sCvar, sizeof(sCvar));
+			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
 
 			ServerCommandEx(sResult, sizeof(sResult), "sm_cvar %s", sCvar);
 
@@ -257,6 +259,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jResponseObject.SetString("type", "map");
 			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("uuid", sUUID);
 			jResponseObject.SetString("response", sResult);
 
 			PushRequest(jResponseObject);
@@ -268,8 +271,10 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sAuth[18];
 			char sReason[64];
 			char sResult[256];
+			char sUUID[64];
 
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
 
 			int iTarget = jReceiveObject.GetInt("target");
 
@@ -279,6 +284,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jResponseObject.SetString("type", "kick");
 			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("uuid", sUUID);
 			jResponseObject.SetString("response", sResult);
 
 			PushRequest(jResponseObject);
@@ -290,14 +296,17 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sAuth[18];
 			char sMapname[PLATFORM_MAX_PATH];
 			char sReason[64];
+			char sUUID[64];
 
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
 			jReceiveObject.GetString("map", sMapname, sizeof(sMapname));
+			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
 
 			JSONObject jResponseObject = new JSONObject();
 
 			jResponseObject.SetString("type", "map");
 			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("uuid", sUUID);
 
 			if (IsMapValid(sMapname))
 			{
@@ -321,9 +330,11 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			char sAuth[18];
 			char sCommand[256];
 			char sResult[256];
+			char sUUID[64];
 
 			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
 			jReceiveObject.GetString("command", sCommand, sizeof(sCommand));
+			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
 
 			ServerCommandEx(sResult, sizeof(sResult), "sm_rcon %s", sCommand);
 
@@ -331,6 +342,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			jResponseObject.SetString("type", "map");
 			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("uuid", sUUID);
 			jResponseObject.SetString("response", sResult);
 
 			PushRequest(jResponseObject);
