@@ -1,7 +1,7 @@
 {
     "plugins": [],
     "env": {
-        "browser": false,
+        "browser": true,
         "commonjs": true,
         "node": true,
         "es6": true

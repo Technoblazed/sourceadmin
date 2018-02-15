@@ -23,6 +23,15 @@ module.exports = {
         ]
       },
       {
+        test: /\.(js)$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env']
+          }
+        }
+      },
+      {
         test: /\.(png|woff|woff2|eot|ttf|svg|otf)$/,
         loader: 'url-loader?limit=100000'
       },
