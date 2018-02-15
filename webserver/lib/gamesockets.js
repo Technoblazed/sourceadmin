@@ -46,6 +46,17 @@ net.createServer((connection) => {
     }
 
     switch (data.type) {
+      case 'ban': {
+        return;
+        /*
+        {
+            type: "ban",
+            auth: data.auth,
+            uuid: data.uuid,
+            response: data.bool
+        }
+        */
+      }
       case 'chat':
       case 'chat_team': {
         self.checkMessageLimit(connection);
@@ -75,7 +86,7 @@ net.createServer((connection) => {
         return;
         /*
         {
-            type: "cvar",
+            type: "kick",
             auth: data.auth,
             uuid: data.uuid,
             response: data.bool

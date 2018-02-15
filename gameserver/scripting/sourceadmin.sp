@@ -232,6 +232,33 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 
 			delete jAuthObject;
 		}
+		else if (StrEqual(sType, "ban"))
+		{
+			char sAuth[18];
+			char sReason[64];
+			char sResult[256];
+			char sUUID[64];
+
+			jReceiveObject.GetString("auth", sAuth, sizeof(sAuth));
+			jReceiveObject.GetString("reason", sReason, sizeof(sReason));
+			jReceiveObject.GetString("uuid", sUUID, sizeof(sUUID));
+
+			int iDuration = jReceiveObject.GetInt("duration");
+			int iTarget = jReceiveObject.GetInt("target");
+
+			ServerCommandEx(sResult, sizeof(sResult), "sm_ban #%i %i %s", iTarget, iDuration, sReason);
+
+			JSONObject jResponseObject = new JSONObject();
+
+			jResponseObject.SetString("type", "ban");
+			jResponseObject.SetString("auth", sAuth);
+			jResponseObject.SetString("uuid", sUUID);
+			jResponseObject.SetString("response", sResult);
+
+			PushRequest(jResponseObject);
+
+			delete jResponseObject;
+		}
 		else if (StrEqual(sType, "chat"))
 		{
 			char sMessage[256];
