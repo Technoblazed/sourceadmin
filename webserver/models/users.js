@@ -5,10 +5,12 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true
     },
     steamAvatar: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: null
     },
     steamUsername: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      defaultValue: null
     },
     userlevel: {
       type: DataTypes.INTEGER(1),
