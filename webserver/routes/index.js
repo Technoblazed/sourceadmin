@@ -23,5 +23,10 @@ module.exports = () => {
     res.redirect('/auth/logout');
   });
 
+  router.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send('User-agent: *');
+  });
+
   return router;
 };
