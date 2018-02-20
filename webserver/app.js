@@ -118,16 +118,18 @@ passport.use(new steamStrategy({
   realm: config.steam.baseURL,
   apiKey: config.steam.apiKey
 }, (identifier, profile, done) => {
+  const steamAvatar = profile._json.avatarfull.split('/').slice(-2).join('/');
+
   db.Users.findOrCreate({
     where: {
       steamId: profile.id
     }
   }).spread((user) => user.updateAttributes({
-    steamAvatar: profile._json.avatarfull,
+    steamAvatar,
     steamUsername: profile.displayName
   }).then(() => {
     done(null, {
-      steamAvatar: profile._json.avatarfull,
+      steamAvatar,
       steamId: profile.id,
       steamUsername: profile.displayName
     });

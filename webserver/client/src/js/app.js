@@ -81,7 +81,7 @@ const websocket = module.exports = {
             if (!usersLoaded.includes(admin.data.steamId)) {
               usersLoaded.push(admin.data.steamId);
 
-              $(`<tr><td><h4 class="ui image header"><img src="${admin.data.steamAvatar}" class="ui mini rounded image"><div class="content">${admin.data.steamUsername}<div class="sub header"><a href="https://steamcommunity.com/profiles/${admin.data.steamId}" target="_blank">${admin.data.steamId}</a></div></div></h4></td ></tr>`).appendTo('#adminList tbody');
+              $(`<tr><td><h4 class="ui image header"><img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/${admin.data.steamAvatar}" class="ui mini rounded image"><div class="content">${admin.data.steamUsername}<div class="sub header"><a href="https://steamcommunity.com/profiles/${admin.data.steamId}" target="_blank">${admin.data.steamId}</a></div></div></h4></td ></tr>`).appendTo('#adminList tbody');
             }
           });
           return;
