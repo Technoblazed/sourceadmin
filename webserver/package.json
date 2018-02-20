@@ -45,7 +45,7 @@
     "path": "^0.12.7",
     "requestretry": "^1.13.0",
     "sequelize": "^4.33.4",
-    "sequelize-auto-migrations": "git+https://git@github.com/technoblazed/sequelize-auto-migrations.git",
+    "sequelize-auto-migrations": "git+https://git@github.com/technoblazed/sequelize-auto-migrations.git#4233c833929a66044fec311ca99ae2dfb15dafc0",
     "serve-favicon": "^2.4.5",
     "url": "^0.11.0",
     "uuid": "^3.2.1",
