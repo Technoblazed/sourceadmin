@@ -869,7 +869,7 @@ public void GenerateReasonFile()
 		SetFailState("Failed to open config file 'config/sourceadmin_reasons.cfg' for writing!");
 	}
 
-	fFile.WriteLine("// List of reasons seperated by a new line, max %d in length", 128);
+	fFile.WriteLine("// List of reasons seperated by a new line, max length of %d per reason", 128);
 	fFile.WriteLine("Advertising");
 	fFile.WriteLine("Chat/Mic Spam");
 	fFile.WriteLine("Disrespect");
