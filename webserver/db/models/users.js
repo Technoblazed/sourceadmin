@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: null
     },
+    userAddress: {
+      type: DataTypes.STRING(15),
+      defaultValue: null
+    },
     userlevel: {
       type: DataTypes.INTEGER(1),
       defaultValue: 0
