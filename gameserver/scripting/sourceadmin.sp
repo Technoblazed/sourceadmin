@@ -225,6 +225,7 @@ public int OnSocketReceive(Handle hSocket, const char[] sReceiveData, const int 
 			JSONObject jAuthObject = new JSONObject();
 
 			jAuthObject.SetString("type", "auth");
+			jAuthObject.SetString("ip", g_sServerIP);
 			jAuthObject.SetString("password", sLocalPassword);
 			jAuthObject.SetString("hostname", sHostname);
 

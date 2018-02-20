@@ -6,10 +6,7 @@ const sequelize = new Sequelize(config.db.database, config.db.username, config.d
   host: config.db.host,
   dialect: 'mysql',
   logging: config.db.logging ? console.log : false,
-  operatorsAliases: Sequelize.Op,
-  sync: {
-    alter: config.db.sync ? config.db.sync : false
-  }
+  operatorsAliases: Sequelize.Op
 });
 
 const db = {};

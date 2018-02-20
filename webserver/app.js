@@ -129,8 +129,8 @@ passport.use(new steamStrategy({
     steamUsername: profile.displayName
   }).then(() => {
     done(null, {
-      steamAvatar,
       steamId: +profile.id,
+      steamAvatar,
       steamUsername: profile.displayName
     });
   }).catch((err) => {
@@ -143,7 +143,11 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((user, done) => {
-  db.Users.findById(user.steamId).then((user) => {
+  db.Users.find({
+    where: {
+      steamId: user.steamId
+    }
+  }).then((user) => {
     done(null, user);
   }).catch((err) => {
     done(err);

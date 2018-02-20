@@ -1,8 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
   const Users = sequelize.define('Users', {
-    steamId: {
-      type: DataTypes.INTEGER(18),
+    id: {
+      type: DataTypes.INTEGER(11),
+      autoIncrement: true,
       primaryKey: true
+    },
+    steamId: {
+      type: DataTypes.BIGINT(18),
+      defaultValue: null
     },
     steamAvatar: {
       type: DataTypes.STRING,
@@ -17,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     }
   });
+
+  Users.associate = (models) => {
+    Users.hasMany(models.ChatLogs);
+  };
 
   return Users;
 };

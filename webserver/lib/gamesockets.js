@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const config = require('../config');
+const db = require('../models/');
 
 const serverData = {};
 const serverList = [];
@@ -33,7 +34,7 @@ net.createServer((connection) => {
     if (!self.connectionExists(connection)) {
       if (data.type === 'auth') {
         if (data.password === config.socket.password) {
-          return self.addConnection(connection);
+          return self.addConnection(connection, data);
         } else {
           return self.writeData(connection, {
             type: 'error',
@@ -59,6 +60,7 @@ net.createServer((connection) => {
       }
       case 'chat':
       case 'chat_team': {
+
         self.checkMessageLimit(connection);
 
         return self.addMessage(connection, data);
@@ -155,16 +157,52 @@ net.createServer((connection) => {
 }).listen(config.socket.port || 19857);
 
 const self = module.exports = {
-  addConnection: (connection) => {
+  addConnection: async(connection, data) => {
     const host = `${connection.remoteAddress}:${connection.remotePort}`;
 
-    serverData[host] = {};
+
     connection.name = host;
+
+    try {
+      const server = await db.Servers.findOrCreate({
+        where: {
+          ip: data.ip,
+          hostname: data.hostname
+        }
+      });
+
+      connection.ip = server[0].ip;
+      connection.serverId = server[0].id;
+
+      serverData[connection.ip] = {};
+    } catch (e) {
+      console.log(e);
+    }
 
     return serverList.push(connection);
   },
-  addMessage: (connection, data) => {
-    return serverData[connection.host].messages.push({
+  addMessage: async(connection, data) => {
+    if (config.socket.logChat) {
+      try {
+        const user = await db.Users.findOrCreate({
+          where: {
+            steamId: +data.steam,
+            steamUsername: data.name
+          }
+        });
+
+        await db.ChatLogs.create({
+          ServerId: connection.serverId,
+          UserId: user[0].id,
+          type: self.messageType(data),
+          message: data.message
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    return serverData[connection.ip].messages.push({
       type: data.type,
       message: data.message,
       name: data.name,
@@ -178,12 +216,12 @@ const self = module.exports = {
     });
   },
   checkMessageLimit: (connection) => {
-    if (!serverData[connection.host].messages) {
-      serverData[connection.host].messages = [];
+    if (!serverData[connection.ip].messages) {
+      serverData[connection.ip].messages = [];
     }
 
-    if (serverData[connection.host].messages.length >= 250) {
-      serverData[connection.host].messages.shift();
+    if (serverData[connection.ip].messages.length >= 250) {
+      serverData[connection.ip].messages.shift();
     }
 
     return;
@@ -193,6 +231,16 @@ const self = module.exports = {
   },
   deleteConnection: (connection) => {
     return serverList.splice(serverList.indexOf(connection), 1);
+  },
+  messageType: (data) => {
+    switch (data.type) {
+      case 'chat': {
+        return data.message.startsWith('@') ? 0 : 1;
+      }
+      case 'chat_team': {
+        return data.message.startsWith('@') ? 2 : 3;
+      }
+    }
   },
   resetHost: (connection) => {
     const host = `${connection.remoteAddress}:${connection.remotePort}`;
