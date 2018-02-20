@@ -144,11 +144,21 @@ const websocket = module.exports = {
 };
 
 const allowedPaths = [
-  '/'
+  /^\/$/,
+  /^\/chat\/(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?$/,
+  /^\/report\/\d{1,}$/,
+  /^\/server\/(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?$/
 ];
+const currentPath = window.location.pathname.toLowerCase();
 
-if (allowedPaths.includes(window.location.pathname.toLowerCase())) {
-  websocket.connect();
-}
+_forEach(allowedPaths, (path) => {
+  const pattern = new RegExp(path);
+
+  if (pattern.test(currentPath)) {
+    websocket.connect();
+
+    return false;
+  }
+});
 
 
