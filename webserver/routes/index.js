@@ -9,7 +9,7 @@ const router = express.Router();
 module.exports = () => {
   router.get('/', ensureLoggedIn, (req, res) => {
     res.render('index', {
-      PAGE_TITLE: 'Home'
+      PAGE_TITLE: 'Dashboard'
     });
   });
 
