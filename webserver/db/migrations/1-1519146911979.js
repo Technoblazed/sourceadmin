@@ -13,8 +13,8 @@ const Sequelize = require('sequelize');
 
 const info = {
   'revision': 1,
-  'name': 'Initial Migration',
-  'created': '2018-02-20T15:43:52.897Z',
+  'name': '1519146911979',
+  'created': '2018-02-20T17:15:11.994Z',
   'comment': ''
 };
 
