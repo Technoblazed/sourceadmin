@@ -56,10 +56,6 @@ const websocket = module.exports = {
       if (wsReconnecting) {
         wsReconnecting = false;
       }
-
-      ws.send(JSON.stringify({
-        type: 'pageLoad'
-      }));
     };
 
     ws.onmessage = (message) => {
@@ -74,16 +70,19 @@ const websocket = module.exports = {
       }
 
       switch (data.type) {
-        case 'pageLoad': {
+        case 'adminUpdate': {
           const usersLoaded = [];
+
+          $('tr[id^=admin]').remove();
 
           _forEach(data.adminList, (admin) => {
             if (!usersLoaded.includes(admin.data.steamId)) {
               usersLoaded.push(admin.data.steamId);
 
-              $(`<tr><td><h4 class="ui image header"><img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/${admin.data.steamAvatar}" class="ui mini rounded image"><div class="content">${admin.data.steamUsername}<div class="sub header"><a href="https://steamcommunity.com/profiles/${admin.data.steamId}" target="_blank">${admin.data.steamId}</a></div></div></h4></td ></tr>`).appendTo('#adminList tbody');
+              $(`<tr id="admin#${admin.data.steamId}"><td><h4 class="ui image header"><img src="https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/${admin.data.steamAvatar}" class="ui mini rounded image"><div class="content">${admin.data.steamUsername}<div class="sub header"><a href="https://steamcommunity.com/profiles/${admin.data.steamId}" target="_blank">${admin.data.steamId}</a></div></div></h4></td ></tr>`).appendTo('#adminList tbody');
             }
           });
+
           return;
         }
       }

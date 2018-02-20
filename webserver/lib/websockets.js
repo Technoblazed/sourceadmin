@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const app = require('../app');
 const config = require('../config');
 const server = app.server;
@@ -58,14 +59,7 @@ wss.on('connection', (connection, req) => {
       return;
     }
 
-    switch (data.type) {
-      case 'pageLoad': {
-        return self.sendMessage(connection, {
-          type: 'pageLoad',
-          adminList: clientData
-        });
-      }
-    }
+    console.log(data);
   });
 });
 
@@ -80,12 +74,31 @@ const self = module.exports = {
     connection.location = url.parse(req.url, true);
     connection.uuid = uuid;
 
-    return clientList.push(connection);
+    clientList.push(connection);
+
+    return self.broadcast({
+      type: 'adminUpdate',
+      adminList: clientData
+    });
+  },
+  broadcast: (message, target) => {
+    _.forEach(clientList, (client) => {
+      if (!target || client.location.path === target) {
+        self.sendMessage(client, message);
+      }
+    });
+
+    return;
   },
   deleteConnection: (connection) => {
     delete clientData[connection.uuid];
 
-    return clientList.splice(clientList.indexOf(connection), 1);
+    clientList.splice(clientList.indexOf(connection), 1);
+
+    return self.broadcast({
+      type: 'adminUpdate',
+      adminList: clientData
+    });
   },
   isOriginAllowed: (origin) => {
     const baseHost = url.parse(config.steam.baseURL, true).host;
