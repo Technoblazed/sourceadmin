@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Users = sequelize.define('Users', {
     steamId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER(18),
       primaryKey: true
     },
     steamAvatar: {

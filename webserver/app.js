@@ -122,7 +122,7 @@ passport.use(new steamStrategy({
 
   db.Users.findOrCreate({
     where: {
-      steamId: profile.id
+      steamId: +profile.id
     }
   }).spread((user) => user.updateAttributes({
     steamAvatar,
@@ -130,7 +130,7 @@ passport.use(new steamStrategy({
   }).then(() => {
     done(null, {
       steamAvatar,
-      steamId: profile.id,
+      steamId: +profile.id,
       steamUsername: profile.displayName
     });
   }).catch((err) => {
