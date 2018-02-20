@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/technoblazed/sourceadmin/issues"
   },
-  "homepage": "https://github.com/technoblazed/sourceadmin",
+  "homepage": "https://github.com/technoblazed/sourceadmin#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "carrier": "^0.3.0",
