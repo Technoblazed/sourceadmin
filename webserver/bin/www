@@ -2,7 +2,7 @@
 
 const app = require('../app').app;
 const config = require('../config');
-const db = require('../models');
+const db = require('../db/models');
 const debug = require('debug')('sourceadmin:server');
 const server = require('../app').server;
 

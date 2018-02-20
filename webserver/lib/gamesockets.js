@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const config = require('../config');
-const db = require('../models/');
+const db = require('../db/models/');
 
 const serverData = {};
 const serverList = [];

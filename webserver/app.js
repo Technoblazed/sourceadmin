@@ -3,7 +3,7 @@
  */
 
 const config = require('./config');
-const db = require('./models');
+const db = require('./db/models');
 
 /**
  *  Webserver Management

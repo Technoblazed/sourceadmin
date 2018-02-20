@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const config = require('../config');
+const config = require('../../config');
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, {
   host: config.db.host,
-  dialect: 'mysql',
+  dialect: config.db.dialect,
   logging: config.db.logging ? console.log : false,
   operatorsAliases: Sequelize.Op
 });
