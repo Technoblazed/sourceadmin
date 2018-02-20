@@ -143,4 +143,12 @@ const websocket = module.exports = {
   }
 };
 
-websocket.connect();
+const allowedPaths = [
+  '/'
+];
+
+if (allowedPaths.includes(window.location.pathname.toLowerCase())) {
+  websocket.connect();
+}
+
+
