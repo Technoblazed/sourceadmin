@@ -11,7 +11,7 @@
     "build": "webpack --config webpack.prod.config.js",
     "analyze": "webpack --config webpack.analyze.config.js",
     "prod-win": "npm run build && set NODE_ENV=production && node bin/www",
-    "prod": "npm run build && NODE_ENV=production nodejs bin/www"
+    "prod": "npm run build && NODE_ENV=production node bin/www"
   },
   "repository": {
     "type": "git",
