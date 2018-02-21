@@ -8,13 +8,14 @@ const Sequelize = require('sequelize');
  * createTable "Servers", deps: []
  * createTable "Users", deps: []
  * createTable "ChatLogs", deps: [Servers, Users]
+ * createTable "Reports", deps: [Servers, Users, Users]
  *
  **/
 
 const info = {
   'revision': 1,
-  'name': '1519146911979',
-  'created': '2018-02-20T17:15:11.994Z',
+  'name': '1519228241076',
+  'created': '2018-02-21T15:50:41.090Z',
   'comment': ''
 };
 
@@ -70,15 +71,15 @@ const migrationCommands = [{
         'type': Sequelize.STRING,
         'defaultValue': null
       },
+      'userAddress': {
+        'type': Sequelize.STRING(15),
+        'defaultValue': null
+      },
       'userlevel': {
         'type': Sequelize.INTEGER(1),
         'defaultValue': 0
       },
       'createdAt': {
-        'type': Sequelize.DATE,
-        'allowNull': false
-      },
-      'updatedAt': {
         'type': Sequelize.DATE,
         'allowNull': false
       }
@@ -107,10 +108,6 @@ const migrationCommands = [{
         'type': Sequelize.DATE,
         'allowNull': false
       },
-      'updatedAt': {
-        'type': Sequelize.DATE,
-        'allowNull': false
-      },
       'ServerId': {
         'type': Sequelize.INTEGER(11),
         'onUpdate': 'CASCADE',
@@ -124,6 +121,58 @@ const migrationCommands = [{
       'UserId': {
         'type': Sequelize.INTEGER(11),
         'onUpdate': 'CASCADE',
+        'onDelete': 'CASCADE',
+        'references': {
+          'model': 'Users',
+          'key': 'id'
+        },
+        'allowNull': true
+      }
+    },
+    {}
+  ]
+},
+{
+  fn: 'createTable',
+  params: [
+    'Reports',
+    {
+      'id': {
+        'type': Sequelize.INTEGER(11),
+        'primaryKey': true,
+        'autoIncrement': true
+      },
+      'reason': {
+        'type': Sequelize.STRING
+      },
+      'createdAt': {
+        'type': Sequelize.DATE,
+        'allowNull': false
+      },
+      'updatedAt': {
+        'type': Sequelize.DATE,
+        'allowNull': false
+      },
+      'ServerId': {
+        'type': Sequelize.INTEGER(11),
+        'onDelete': 'CASCADE',
+        'references': {
+          'model': 'Servers',
+          'key': 'id'
+        },
+        'allowNull': true
+      },
+      'ReportedId': {
+        'type': Sequelize.INTEGER(11),
+        'onDelete': 'CASCADE',
+        'references': {
+          'model': 'Users',
+          'key': 'id'
+        },
+        'allowNull': true
+      },
+      'ReporterId': {
+        'type': Sequelize.INTEGER(11),
         'onDelete': 'CASCADE',
         'references': {
           'model': 'Users',

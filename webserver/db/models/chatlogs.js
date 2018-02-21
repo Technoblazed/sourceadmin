@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: 0
     }
+  }, {
+    updatedAt: false
   });
 
   ChatLogs.associate = (models) => {
