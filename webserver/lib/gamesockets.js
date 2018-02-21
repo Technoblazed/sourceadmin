@@ -62,14 +62,6 @@ net.createServer((connection) => {
       case 'chat':
       case 'chat_team': {
         return self.addMessage(connection, data);
-        /*
-        {
-            type: 'chat',
-            message: data.message,
-            name: data.name,
-            steam: data.steam
-        }
-        */
       }
       case 'cvar': {
         return;
@@ -135,31 +127,7 @@ net.createServer((connection) => {
         */
       }
       case 'report': {
-        self.addReport(connection, data);
-        return;
-        /*
-        {
-            type: 'report',
-            reason: 'Harrassment',
-            cAddress: '172.25.37.225',
-            tAddress: '172.25.37.225',
-            cAuth: '76561198142258240',
-            tAuth: '76561198142258240',
-            cName: 'BOT Techno',
-            tName: 'BOT Techno'
-        }
-        {
-            type: data.type,
-            ip: data.cAddress,
-            tAddress: data.tAddress,
-            cAuth: data.cAuth,
-            tAuth: data.tAuth,
-            cName: data.cName,
-            tName: data.tName,
-            sAddress: data.ip,
-            reason: data.reason
-        }
-        */
+        return self.addReport(connection, data);
       }
     }
   });
