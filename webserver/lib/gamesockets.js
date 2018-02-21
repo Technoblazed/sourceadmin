@@ -60,9 +60,6 @@ net.createServer((connection) => {
       }
       case 'chat':
       case 'chat_team': {
-
-        self.checkMessageLimit(connection);
-
         return self.addMessage(connection, data);
         /*
         {
@@ -184,47 +181,35 @@ const self = module.exports = {
   addMessage: async(connection, data) => {
     if (config.socket.logChat) {
       try {
-        const user = await db.Users.findOrCreate({
-          where: {
-            steamId: +data.steam,
-            steamUsername: data.name
-          }
-        });
-
-        await db.ChatLogs.create({
-          ServerId: connection.serverId,
-          UserId: user[0].id,
-          type: self.messageType(data),
-          message: data.message
+        await db.sequelize.transaction((t) => {
+          return db.Users.findOrCreate({
+            where: {
+              steamId: +data.steam,
+              steamUsername: data.name
+            },
+            transaction: t
+          }).then((user) => {
+            return db.ChatLogs.create({
+              ServerId: connection.serverId,
+              UserId: user[0].id,
+              type: self.messageType(data),
+              message: data.message
+            }, {
+              transaction: t
+            });
+          });
         });
       } catch (e) {
         console.log(e);
       }
     }
 
-    return serverData[connection.ip].messages.push({
-      type: data.type,
-      message: data.message,
-      name: data.name,
-      steam: data.steam,
-      timestamp: new Date()
-    });
+    // Broadcast message here
   },
   broadcast: (data) => {
     return _.forEach(serverList, (server) => {
       self.writeData(server, data);
     });
-  },
-  checkMessageLimit: (connection) => {
-    if (!serverData[connection.ip].messages) {
-      serverData[connection.ip].messages = [];
-    }
-
-    if (serverData[connection.ip].messages.length >= 250) {
-      serverData[connection.ip].messages.shift();
-    }
-
-    return;
   },
   connectionExists: (connection) => {
     return serverList.includes(connection);
