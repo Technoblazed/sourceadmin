@@ -92,7 +92,7 @@ const self = module.exports = {
   },
   broadcastMessage: (connection, data) => {
     _.forEach(clientList, (client) => {
-      const regex = new RegExp(`(?:^/$)|(?:^/server/(?:${connection.ip})?$)`);
+      const regex = new RegExp(`(?:^/$)|(?:^/server/(?:${connection.ip.replace(/\./g, '\\.')})$)`);
 
       if (regex.test(client.location.path)) {
         self.sendMessage(client, data);

@@ -159,27 +159,33 @@ const self = module.exports = {
   },
   addMessage: async(connection, data) => {
     if (config.socket.logChat) {
+      let transaction;
+
       try {
-        await db.sequelize.transaction((t) => {
-          return db.Users.findOrCreate({
-            where: {
-              steamId: +data.steam,
-              steamUsername: data.name
-            },
-            transaction: t
-          }).then((user) => {
-            return db.ChatLogs.create({
-              ServerId: connection.serverId,
-              UserId: user[0].id,
-              type: self.messageType(data),
-              message: data.message
-            }, {
-              transaction: t
-            });
-          });
+        transaction = await db.sequelize.transaction();
+
+        const user = await db.Users.findOrCreate({
+          where: {
+            steamId: +data.steam,
+            steamUsername: data.name
+          },
+          transaction
         });
+
+        await db.ChatLogs.create({
+          ServerId: connection.serverId,
+          UserId: user[0].id,
+          type: self.messageType(data),
+          message: data.message
+        }, {
+          transaction
+        });
+
+        await transaction.commit();
       } catch (e) {
         console.log(e);
+
+        await transaction.rollback();
       }
     }
 
