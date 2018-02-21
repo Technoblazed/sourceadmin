@@ -85,6 +85,10 @@ const websocket = module.exports = {
 
           return;
         }
+        case 'chat':
+        case 'chat_team': {
+          return;
+        }
       }
     };
 

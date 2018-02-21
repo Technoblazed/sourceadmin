@@ -13,14 +13,17 @@ ArrayList g_aReasons;
 char g_sReasonsFile[256];
 char g_sServerIP[16];
 
-ConVar g_cHostName;
 ConVar g_cBroadcastNames;
+ConVar g_cFloodTime;
 ConVar g_cHideTriggers;
+ConVar g_cHostName;
 ConVar g_cSocketAddress;
 ConVar g_cSocketMaxRetries;
 ConVar g_cSocketPassword;
 ConVar g_cSocketPort;
 ConVar g_cReportImmunity;
+
+float g_fLastMessage[MAXPLAYERS + 1];
 
 int g_iRetries;
 int g_iReportTarget[MAXPLAYERS + 1];
@@ -115,6 +118,23 @@ public void OnPluginStart()
 
 	BuildIP();
 	ParseReasonsFile();
+}
+
+public void OnAllPluginsLoaded()
+{
+	if (FindConVar("sm_flood_time") == INVALID_HANDLE)
+	{
+		g_cFloodTime = CreateConVar("sm_flood_time", "0.75", "Amount of time allowed between chat messages", FCVAR_DONTRECORD);
+	}
+	else
+	{
+		g_cFloodTime = FindConVar("sm_flood_time");
+	}
+}
+
+public void OnClientPutInServer(int iClient)
+{
+	g_fLastMessage[iClient] = 0.0;
 }
 
 public void OnConfigsExecuted()
@@ -690,10 +710,12 @@ public Action CommandListener_SayTeam(int iClient, const char[] sCommand, int iA
 
 public void OnChatMessage(int iClient, char[] sMessage, int iType)
 {
-	if (!IsValidClient(iClient))
+	if (!IsValidClient(iClient) || g_fLastMessage[iClient] + g_cFloodTime.FloatValue >= GetGameTime())
 	{
 		return;
 	}
+
+	g_fLastMessage[iClient] = GetGameTime();
 
 	StripQuotes(sMessage);
 

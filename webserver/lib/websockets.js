@@ -90,6 +90,17 @@ const self = module.exports = {
 
     return;
   },
+  broadcastMessage: (connection, data) => {
+    _.forEach(clientList, (client) => {
+      const regex = new RegExp(`(?:^/$)|(?:^/server/(?:${connection.ip})?$)`);
+
+      if (regex.test(client.location.path)) {
+        self.sendMessage(client, data);
+      }
+    });
+
+    return;
+  },
   deleteConnection: (connection) => {
     delete clientData[connection.uuid];
 

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const config = require('../config');
 const db = require('../db/models/');
+const websockets = require('./websockets');
 
 const serverData = {};
 const serverList = [];
@@ -157,7 +158,6 @@ const self = module.exports = {
   addConnection: async(connection, data) => {
     const host = `${connection.remoteAddress}:${connection.remotePort}`;
 
-
     connection.name = host;
 
     try {
@@ -204,7 +204,7 @@ const self = module.exports = {
       }
     }
 
-    // Broadcast message here
+    return websockets.broadcastMessage(connection, data);
   },
   broadcast: (data) => {
     return _.forEach(serverList, (server) => {

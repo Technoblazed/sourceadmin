@@ -84,7 +84,6 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieParser());
 
-
 const sessionParser = session({
   secret: config.webserver.sessionSecret,
   saveUninitialized: true,
