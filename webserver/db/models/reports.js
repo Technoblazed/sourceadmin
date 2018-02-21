@@ -7,6 +7,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     reason: {
       type: DataTypes.STRING
+    },
+    state: {
+      type: DataTypes.TINYINT(1),
+      defaultValue: 0
+    },
+    handledAt: {
+      type: DataTypes.DATE,
+      default: null
+    },
+    closedAt: {
+      type: DataTypes.DATE,
+      default: null
     }
   });
 
@@ -24,6 +36,11 @@ module.exports = (sequelize, DataTypes) => {
     Reports.belongsTo(models.Users, {
       onDelete: 'CASCADE',
       foreignKey: 'ReporterId',
+      constraints: false
+    });
+    Reports.belongsTo(models.Users, {
+      onDelete: 'CASCADE',
+      foreignKey: 'HandlerId',
       constraints: false
     });
   };

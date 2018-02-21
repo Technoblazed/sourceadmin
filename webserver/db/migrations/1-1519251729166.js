@@ -8,14 +8,17 @@ const Sequelize = require('sequelize');
  * createTable "Servers", deps: []
  * createTable "Users", deps: []
  * createTable "ChatLogs", deps: [Servers, Users]
- * createTable "Reports", deps: [Servers, Users, Users]
+ * createTable "Reports", deps: [Servers, Users, Users, Users]
+ * addIndex ["createdAt"] to table "ChatLogs"
+ * addIndex ["message"] to table "ChatLogs"
+ * addIndex ["type"] to table "ChatLogs"
  *
  **/
 
 const info = {
   'revision': 1,
-  'name': '1519228241076',
-  'created': '2018-02-21T15:50:41.090Z',
+  'name': '1519251729166',
+  'created': '2018-02-21T22:22:09.190Z',
   'comment': ''
 };
 
@@ -82,6 +85,10 @@ const migrationCommands = [{
       'createdAt': {
         'type': Sequelize.DATE,
         'allowNull': false
+      },
+      'updatedAt': {
+        'type': Sequelize.DATE,
+        'allowNull': false
       }
     },
     {}
@@ -145,6 +152,18 @@ const migrationCommands = [{
       'reason': {
         'type': Sequelize.STRING
       },
+      'state': {
+        'type': Sequelize.TINYINT(1),
+        'defaultValue': 0
+      },
+      'handledAt': {
+        'type': Sequelize.DATE,
+        'default': null
+      },
+      'closedAt': {
+        'type': Sequelize.DATE,
+        'default': null
+      },
       'createdAt': {
         'type': Sequelize.DATE,
         'allowNull': false
@@ -179,8 +198,38 @@ const migrationCommands = [{
           'key': 'id'
         },
         'allowNull': true
+      },
+      'HandlerId': {
+        'type': Sequelize.INTEGER(11),
+        'onDelete': 'CASCADE',
+        'references': {
+          'model': 'Users',
+          'key': 'id'
+        },
+        'allowNull': true
       }
     },
+    {}
+  ]
+},
+{
+  fn: 'addIndex',
+  params: [
+    'ChatLogs', ['createdAt'],
+    {}
+  ]
+},
+{
+  fn: 'addIndex',
+  params: [
+    'ChatLogs', ['message'],
+    {}
+  ]
+},
+{
+  fn: 'addIndex',
+  params: [
+    'ChatLogs', ['type'],
     {}
   ]
 }

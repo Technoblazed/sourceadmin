@@ -13,6 +13,23 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     }
   }, {
+    indexes: [
+      {
+        fields: [
+          'createdAt'
+        ]
+      },
+      {
+        fields: [
+          'message'
+        ]
+      },
+      {
+        fields: [
+          'type'
+        ]
+      }
+    ],
     updatedAt: false
   });
 

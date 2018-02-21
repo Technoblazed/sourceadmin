@@ -135,8 +135,19 @@ net.createServer((connection) => {
         */
       }
       case 'report': {
+        self.addReport(connection, data);
         return;
         /*
+        {
+            type: 'report',
+            reason: 'Harrassment',
+            cAddress: '172.25.37.225',
+            tAddress: '172.25.37.225',
+            cAuth: '76561198142258240',
+            tAuth: '76561198142258240',
+            cName: 'BOT Techno',
+            tName: 'BOT Techno'
+        }
         {
             type: data.type,
             ip: data.cAddress,
@@ -205,6 +216,50 @@ const self = module.exports = {
     }
 
     return websockets.broadcastMessage(connection, data);
+  },
+  addReport: async(connection, data) => {
+    let transaction;
+
+    try {
+      transaction = await db.sequelize.transaction();
+
+      const reported = await db.Users.findOrCreate({
+        where: {
+          steamId: +data.tAuth,
+          steamUsername: data.tName
+        },
+        transaction
+      }).spread((user) => user.updateAttributes({
+        steamUsername: data.tName,
+        userAddress: data.tAddress
+      }));
+
+      const reporter = await db.Users.findOrCreate({
+        where: {
+          steamId: +data.cAuth,
+          steamUsername: data.cName
+        },
+        transaction
+      }).spread((user) => user.updateAttributes({
+        steamUsername: data.cName,
+        userAddress: data.cAddress
+      }));
+
+      await db.Reports.create({
+        ServerId: connection.serverId,
+        ReportedId: reported.id,
+        ReporterId: reporter.id,
+        reason: data.reason
+      }, {
+        transaction
+      });
+
+      await transaction.commit();
+    } catch (e) {
+      console.log(e);
+
+      await transaction.rollback();
+    }
   },
   broadcast: (data) => {
     return _.forEach(serverList, (server) => {
